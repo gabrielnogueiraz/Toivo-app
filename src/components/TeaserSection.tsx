@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import teaserVideo from '@/assets/teaser.mp4';
 
 const TeaserSection = () => {
   return (
@@ -8,18 +9,17 @@ const TeaserSection = () => {
           {/* Video Preview */}
           <div className="relative group order-2 lg:order-1">
             <div className="aspect-video rounded-2xl glass-effect p-4 sm:p-6 lg:p-8 flex items-center justify-center relative overflow-hidden hover-glow">
-              {/* Video placeholder with play button */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-violet-900/20" />
-              <div className="relative z-10 text-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full glass-effect flex items-center justify-center mb-3 sm:mb-4 mx-auto group-hover:scale-110 transition-transform duration-300 animate-pulse-glow">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-purple-300" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </div>
-                <p className="text-sm sm:text-base text-purple-300 font-medium">Preview do Toivo</p>
-                <p className="text-xs sm:text-sm text-slate-400 mt-1 sm:mt-2">2:30 minutos</p>
-              </div>
-              
+              {/* Video player */}
+              <video
+                className="rounded-xl w-full h-full object-cover shadow-2xl border-2 border-purple-900/30"
+                src={teaserVideo}
+                controls
+                preload="metadata"
+                poster="/assets/teaser-poster.png"
+                style={{ background: 'linear-gradient(135deg, #6d28d9 0%, #a78bfa 100%)' }}
+              >
+                Seu navegador não suporta o elemento <code>video</code>.
+              </video>
               {/* Floating elements */}
               <div className="absolute top-2 right-2 sm:top-4 sm:right-4 w-2 h-2 sm:w-3 sm:h-3 bg-purple-400 rounded-full animate-float opacity-60" />
               <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-violet-400 rounded-full animate-float opacity-40" style={{animationDelay: '1s'}} />
