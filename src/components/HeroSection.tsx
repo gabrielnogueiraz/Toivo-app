@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ArrowUp, Star } from 'lucide-react';
+import WaitlistInput from '@/components/ui/waitlistInput';
 
 const HeroSection = () => {
   return (
@@ -37,28 +38,19 @@ const HeroSection = () => {
           Com IA integrada e gamificação inteligente.
         </p>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12 sm:mb-16 px-4">
-          <Button 
-            size="lg" 
-            className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold hover-glow transition-all duration-300 group"
-          >
-            <Star className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
-            <span className="hidden sm:inline">Plantar minha primeira semente</span>
-            <span className="sm:hidden">Começar agora</span>
-            <ArrowUp className="ml-2 h-4 sm:h-5 w-4 sm:w-5 group-hover:rotate-45 transition-transform" />
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="w-full sm:w-auto border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-400 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold transition-all duration-300"
-          >
-            ▶️ Ver vídeo teaser
-          </Button>
+        {/* Lista de espera - Slogan e input */}
+        <div className="flex flex-col items-center justify-center mb-12 sm:mb-16 px-4 w-full">
+          <span className="block text-xs sm:text-sm text-slate-300 mb-5 text-center max-w-xl">
+            Adicione seu e-mail para ser notificado quando o aplicativo for lançado e garanta acesso antecipado à experiência mais inovadora de produtividade.
+          </span>
+          {/* Input para lista de espera */}
+          <div className="w-full flex justify-center">
+            {/* WaitlistInput */}
+            <WaitlistInput />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 justify-center items-center text-center max-w-2xl mx-auto">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 justify-center items-center text-center max-w-2xl mx-auto">
           <div className="glass-effect px-4 py-3 sm:px-6 sm:py-4 rounded-lg">
             <div className="text-xl sm:text-2xl font-bold text-purple-400">10K+</div>
             <div className="text-xs sm:text-sm text-slate-400">Jardins cultivados</div>
@@ -71,7 +63,7 @@ const HeroSection = () => {
             <div className="text-xl sm:text-2xl font-bold text-purple-300">4.9★</div>
             <div className="text-xs sm:text-sm text-slate-400">Avaliação média</div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Gradient overlay at bottom */}
