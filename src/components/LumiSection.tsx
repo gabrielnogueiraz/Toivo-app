@@ -46,12 +46,12 @@ const LumiSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Lumi Avatar/Visualization */}
           <div className="relative order-2 lg:order-1">
-            <div className="aspect-square max-w-xs sm:max-w-sm md:max-w-md mx-auto relative">
+            <div className="w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] mx-auto relative">
               {/* Main avatar container */}
-              <div className="absolute inset-0 rounded-full glass-effect p-6 sm:p-8 animate-pulse-glow">
+              <div className="absolute inset-0 rounded-full glass-effect p-10 sm:p-12 md:p-16 animate-pulse-glow">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-600/20 to-violet-600/20 flex items-center justify-center relative overflow-hidden">
-                  {/* Lumi face/representation - Increased size */}
-                  <Bot className="text-8xl sm:text-9xl md:text-[12rem] lg:text-[14rem] text-purple-300 animate-float" />
+                  {/* Lumi face/representation - Significantly increased size */}
+                  <Bot className="text-[550px] sm:text-[550px] md:text-[550px] text-purple-300 animate-float" />
                   
                   {/* Orbiting elements */}
                   <div className="absolute top-3 right-6 sm:top-4 sm:right-8 w-3 h-3 sm:w-4 sm:h-4 bg-purple-400 rounded-full animate-float opacity-60" />
