@@ -41,14 +41,6 @@ const CTASection = () => {
               <span className="sm:hidden">Criar conta gratuita</span>
               <ArrowUp className="ml-2 h-4 sm:h-5 w-4 sm:w-5 group-hover:rotate-45 transition-transform" />
             </Button>
-            
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="w-full sm:w-auto border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-400 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold transition-all duration-300"
-            >
-              Agendar demonstração
-            </Button>
           </div>
 
           {/* Trust indicators */}
