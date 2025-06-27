@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import logo from '@/assets/logo.png';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -23,7 +24,13 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <div className="flex items-end">
-            <span className="text-xl sm:text-3xl font-jakarta font-bold text-white ml-2 sm:ml-3 leading-none">Toivo</span>
+            <img
+              src={logo}
+              alt="Toivo Logo"
+              className="h-6 sm:h-9 w-auto select-none"
+              style={{ display: 'block' }}
+              draggable={false}
+            />
           </div>
 
           {/* Desktop Navigation Links */}
@@ -34,13 +41,13 @@ const Navbar = () => {
             <a href="#preview" className="text-sm lg:text-base text-slate-300 hover:text-white transition-colors duration-200">
               Preview
             </a>
-            <Button 
+            {/* <Button 
               variant="outline" 
               size="sm"
               className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-200 text-sm px-4 py-2"
             >
               Entrar
-            </Button>
+            </Button> */}
           </div>
 
           {/* Mobile menu button */}
