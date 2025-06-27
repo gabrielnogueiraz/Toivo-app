@@ -16,7 +16,7 @@ const Index = () => {
       <LumiSection />
       <GardenSection />
       <FeaturesSection />
-      <CTASection />
+      {/* <CTASection /> */}
       <Footer />
     </div>
   );

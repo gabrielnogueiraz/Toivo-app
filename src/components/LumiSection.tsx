@@ -106,12 +106,12 @@ const LumiSection = () => {
         </div>
 
         {/* Interactive demo hint */}
-        <div className="mt-12 sm:mt-16 text-center">
+        {/* <div className="mt-12 sm:mt-16 text-center">
           <div className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 glass-effect rounded-full hover-glow group cursor-pointer">
             <span className="text-sm sm:text-base text-purple-300 font-medium mr-2">Experimente conversar com a Lumi</span>
             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-400 rounded-full animate-pulse group-hover:animate-bounce" />
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );
