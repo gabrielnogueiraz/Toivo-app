@@ -34,9 +34,6 @@ const Footer = () => {
             {/* Brand section */}
             <div className="lg:col-span-2">
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">T</span>
-                </div>
                 <span className="text-xl font-jakarta font-bold text-white">Toivo</span>
               </div>
               <p className="text-slate-400 leading-relaxed mb-6 max-w-sm">
@@ -106,10 +103,10 @@ const Footer = () => {
           {/* Bottom section */}
           <div className="border-t border-slate-800/50 pt-8 flex flex-col md:flex-row justify-between items-center">
             <div className="text-slate-400 text-sm mb-4 md:mb-0">
-              © 2024 Toivo. Todos os direitos reservados.
+              © 2025 Toivo. Todos os direitos reservados.
             </div>
             <div className="flex items-center space-x-6 text-sm text-slate-400">
-              <span>🌱 Feito com amor e IA</span>
+              <span>🌱 Feito com amor</span>
               <div className="flex items-center space-x-1">
                 <span>Status:</span>
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
