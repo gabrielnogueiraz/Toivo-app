@@ -93,8 +93,8 @@ const FeaturesSection = () => {
 
                 {/* Learn more link */}
                 <div className="flex items-center text-purple-400 text-xs sm:text-sm font-medium group-hover:text-purple-300 transition-colors cursor-pointer">
-                  <span>Saiba mais</span>
-                  <ArrowUp className="w-3 h-3 sm:w-4 sm:h-4 ml-1 group-hover:translate-x-1 transition-transform rotate-45" />
+                  {/* <span>Saiba mais</span> */}
+                  {/* <ArrowUp className="w-3 h-3 sm:w-4 sm:h-4 ml-1 group-hover:translate-x-1 transition-transform rotate-45" /> */}
                 </div>
               </div>
             );
@@ -102,12 +102,12 @@ const FeaturesSection = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-12 sm:mt-16">
+        {/* <div className="text-center mt-12 sm:mt-16">
           <div className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 glass-effect rounded-full hover-glow group cursor-pointer">
             <span className="text-sm sm:text-base text-purple-300 font-medium mr-2">Explore todos os recursos</span>
             <ArrowUp className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400 group-hover:translate-x-1 transition-transform rotate-45" />
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );
