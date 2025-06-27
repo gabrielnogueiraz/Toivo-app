@@ -58,7 +58,6 @@ const HeroSection = () => {
           </Button>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 justify-center items-center text-center max-w-2xl mx-auto">
           <div className="glass-effect px-4 py-3 sm:px-6 sm:py-4 rounded-lg">
             <div className="text-xl sm:text-2xl font-bold text-purple-400">10K+</div>
