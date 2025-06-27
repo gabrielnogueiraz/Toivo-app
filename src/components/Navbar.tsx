@@ -22,11 +22,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
-              <span className="text-white font-bold text-xs sm:text-sm">T</span>
-            </div>
-            <span className="text-lg sm:text-xl font-jakarta font-bold text-white">Toivo</span>
+          <div className="flex items-end">
+            <span className="text-xl sm:text-3xl font-jakarta font-bold text-white ml-2 sm:ml-3 leading-none">Toivo</span>
           </div>
 
           {/* Desktop Navigation Links */}
