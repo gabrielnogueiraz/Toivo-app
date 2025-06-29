@@ -19,20 +19,38 @@ export function WaitlistInput() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) {
+      setError('Por favor, insira um e-mail válido');
+      return;
+    }
+
     setSuccess('');
     setError('');
     setLoading(true);
+    
     try {
-      await waitlistService.joinWaitlist(email);
-      toast({
-        title: 'Inscrição realizada!',
-        description: 'Você será notificado no lançamento.',
-        duration: 4000,
-        className: 'bg-gradient-to-r from-purple-800/90 to-violet-900/90 border-0 text-purple-100 shadow-xl font-medium',
-      });
-      setEmail('');
+      const response = await waitlistService.joinWaitlist({ email: email.trim() });
+      
+      if (response.success) {
+        toast({
+          title: 'Inscrição realizada!',
+          description: 'Você será notificado no lançamento.',
+          duration: 4000,
+          className: 'bg-gradient-to-r from-purple-800/90 to-violet-900/90 border-0 text-purple-100 shadow-xl font-medium',
+        });
+        setEmail('');
+        setSuccess('Inscrição realizada com sucesso!');
+      }
     } catch (err: any) {
-      setError(err?.message || 'Erro ao cadastrar e-mail. Tente novamente.');
+      const errorMessage = err?.error?.message || 'Erro ao cadastrar e-mail. Tente novamente.';
+      setError(errorMessage);
+      
+      toast({
+        title: 'Erro',
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 4000,
+      });
     } finally {
       setLoading(false);
     }
