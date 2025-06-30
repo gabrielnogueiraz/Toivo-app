@@ -69,16 +69,16 @@ const VisualPanel: React.FC<VisualPanelProps> = ({ title, subtitle }) => {
 
         {/* Text content */}
         <div className="space-y-6 max-w-md animate-fade-in">
-          <h1 className="text-4xl font-bold text-white font-jakarta leading-tight">
+          <h1 className="text-4xl font-bold text-white font-heading leading-tight">
             {title}
           </h1>
-          <p className="text-lg text-gray-300 font-inter leading-relaxed">
+          <p className="text-lg text-gray-300 leading-relaxed">
             {subtitle}
           </p>
 
           {/* Decorative quote */}
           <div className="mt-12 pt-8 border-t border-white/10">
-            <p className="text-sm text-gray-400 font-inter italic">
+            <p className="text-sm text-gray-400 italic">
               "A produtividade floresce quando encontra propósito"
             </p>
           </div>

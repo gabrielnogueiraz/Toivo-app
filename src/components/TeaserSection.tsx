@@ -43,7 +43,7 @@ const TeaserSection = () => {
           {/* Content */}
           <div className="space-y-6 sm:space-y-8 order-1 lg:order-2">
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-jakarta font-bold text-white mb-3 sm:mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-3 sm:mb-4">
                 Veja o futuro da{" "}
                 <span className="text-gradient">produtividade</span>
               </h2>

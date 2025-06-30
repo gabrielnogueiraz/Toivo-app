@@ -105,10 +105,10 @@ const Register = () => {
               />
             </div>
 
-            <h1 className="text-3xl font-bold text-white font-jakarta">
+            <h1 className="text-3xl font-bold text-white font-heading">
               Crie sua conta
             </h1>
-            <p className="text-gray-400 font-inter">
+            <p className="text-gray-400">
               Junte-se à comunidade que transforma produtividade em arte
             </p>
           </div>
@@ -185,7 +185,7 @@ const Register = () => {
 
           {/* Footer */}
           <div className="text-center pt-6 border-t border-white/10">
-            <p className="text-gray-400 font-inter">
+            <p className="text-gray-400">
               Já tem uma conta?{" "}
               <Link
                 to="/login"

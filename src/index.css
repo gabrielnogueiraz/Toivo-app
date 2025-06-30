@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import '@fontsource/plus-jakarta-sans';
+@import '@fontsource/manrope';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,6 +11,9 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Manrope', sans-serif;
+    
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -102,25 +107,26 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
 
 @layer utilities {
   .gradient-bg {
-    background: radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
-                #0f172a;
+    background: radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
+                black;
   }
   
   .glass-effect {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .glow-purple {
-    box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   }
   
   .text-gradient {

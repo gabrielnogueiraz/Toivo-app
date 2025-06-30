@@ -20,7 +20,7 @@ const GardenSection = () => {
             <span className="text-sm text-purple-300 font-medium">Seu progresso visual</span>
           </div>
           
-          <h2 className="text-3xl md:text-5xl font-jakarta font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6">
             Seu{" "}
             <span className="text-gradient">Jardim Virtual</span>
           </h2>
@@ -31,10 +31,10 @@ const GardenSection = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* Garden Visualization */}
           <div className="relative">
-            <div className="aspect-square max-w-lg mx-auto relative glass-effect rounded-2xl p-8 hover-glow">
+            <div className="aspect-square max-w-lg mx-auto relative glass-effect rounded-2xl p-4 md:p-8 hover-glow overflow-hidden">
               {/* Garden background */}
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-green-900/20 to-emerald-900/20" />
               
@@ -98,7 +98,7 @@ const GardenSection = () => {
           {/* Garden Stats & Info */}
           <div className="space-y-8">
             <div>
-              <h3 className="text-2xl font-jakarta font-bold text-white mb-4">
+              <h3 className="text-2xl font-heading font-bold text-white mb-4">
                 Como funciona seu jardim
               </h3>
               <p className="text-lg text-slate-300 leading-relaxed mb-8">

@@ -25,7 +25,7 @@ const FormInput: React.FC<FormInputProps> = ({
 
   return (
     <div className="group relative">
-      <label className="block text-sm font-medium text-gray-300 mb-2 font-inter">
+      <label className="block text-sm font-medium text-gray-300 mb-2">
         {label}
       </label>
       <div className="relative">
@@ -38,7 +38,7 @@ const FormInput: React.FC<FormInputProps> = ({
           onBlur={() => setIsFocused(false)}
           className={`
             w-full px-4 py-4 rounded-xl bg-white/5 backdrop-blur-sm border-2 
-            text-white placeholder-gray-400 font-inter
+            text-white placeholder-gray-400
             transition-all duration-300 ease-out
             ${
               isFocused
@@ -62,7 +62,7 @@ const FormInput: React.FC<FormInputProps> = ({
         )}
       </div>
       {error && (
-        <p className="mt-2 text-sm text-red-400 font-inter animate-fade-in">
+        <p className="mt-2 text-sm text-red-400 animate-fade-in">
           {error}
         </p>
       )}

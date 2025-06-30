@@ -22,7 +22,7 @@ const FormButton: React.FC<FormButtonProps> = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const baseClasses = `
-    relative px-8 py-4 rounded-xl font-semibold font-inter text-base
+    relative px-8 py-4 rounded-xl font-semibold text-base
     transition-all duration-300 ease-out
     disabled:opacity-50 disabled:cursor-not-allowed
     group overflow-hidden

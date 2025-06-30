@@ -98,10 +98,10 @@ const Login = () => {
               />
             </div>
 
-            <h1 className="text-3xl font-bold text-white font-jakarta">
+            <h1 className="text-3xl font-bold text-white font-heading">
               Bem-vindo de volta
             </h1>
-            <p className="text-gray-400 font-inter">
+            <p className="text-gray-400">
               Continue sua jornada de crescimento
             </p>
           </div>
@@ -152,13 +152,10 @@ const Login = () => {
 
           {/* Footer */}
           <div className="text-center pt-6 border-t border-white/10">
-            <p className="text-gray-400 font-inter">
-              Ainda não tem uma conta?{" "}
-              <Link
-                to="/register"
-                className="text-toivo-purple-400 hover:text-toivo-purple-300 transition-colors font-semibold"
-              >
-                Criar agora
+            <p className="text-gray-400">
+              Não tem uma conta?{' '}
+              <Link to="/register" className="text-toivo-purple-400 hover:text-toivo-purple-300 transition-colors font-semibold">
+                Cadastre-se
               </Link>
             </p>
           </div>
