@@ -4,9 +4,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import AuthenticatedLayout from "@/layouts/AuthenticatedLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import PomodoroPage from "./pages/PomodoroPage";
+import BoardsPage from "./pages/BoardsPage";
+import Board from "./pages/Board";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +27,15 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
+            {/* Rotas autenticadas */}
+            <Route element={<AuthenticatedLayout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/pomodoro" element={<PomodoroPage />} />
+              <Route path="/boards" element={<BoardsPage />} />
+              <Route path="/board/:boardId" element={<Board />} />
+            </Route>
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

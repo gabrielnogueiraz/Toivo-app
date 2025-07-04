@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Toivo - Productivity App</title>
     <link rel="icon" type="image/png" href="/src/assets/favicon.png" />
     <meta name="description" content="Toivo - Productivity App" />
@@ -15,17 +15,29 @@
     <!-- iOS Safari (iPhone) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Toivo">
     
     <!-- Android Chrome -->
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#a855f7" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#a855f7" media="(prefers-color-scheme: light)">
     
     <!-- Windows Phone -->
-    <meta name="msapplication-navbutton-color" content="#000000">
-    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="msapplication-navbutton-color" content="#a855f7">
+    <meta name="msapplication-TileColor" content="#a855f7">
     
     <!-- Safari 15+ -->
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#a855f7">
+    
+    <!-- PWA Support -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Toivo">
+    
+    <!-- Prevent text size adjust on orientation change -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="address=no">
+    
+    <!-- Safe area support -->
+    <meta name="viewport-fit" content="cover">
   </head>
 
   <body>
