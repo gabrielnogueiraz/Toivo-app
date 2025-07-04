@@ -20,7 +20,7 @@ const Register = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
@@ -60,7 +60,7 @@ const Register = () => {
       toast.success('Conta criada com sucesso!', {
         description: 'Bem-vindo(a) ao Toivo! Redirecionando...',
       });
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Erro ao criar a conta. Tente novamente.';
       toast.error('Falha no Registro', {

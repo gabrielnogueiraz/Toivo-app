@@ -19,7 +19,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate("/dashboard", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -49,9 +49,9 @@ const Login = () => {
     try {
       await login(formData);
       toast.success("Login bem-sucedido!", {
-        description: "Redirecionando para a sua jornada...",
+        description: "Redirecionando para o dashboard...",
       });
-      navigate("/");
+      navigate("/dashboard", { replace: true });
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||
