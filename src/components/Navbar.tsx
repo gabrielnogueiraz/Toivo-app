@@ -47,7 +47,7 @@ const Navbar = () => {
       <a href="/#preview" className="text-sm lg:text-base text-slate-300 hover:text-white transition-colors duration-200">
         Preview
       </a>
-      {/* <Link to="/login">
+      <Link to="/login">
         <Button
           variant="outline"
           size="sm"
@@ -55,7 +55,7 @@ const Navbar = () => {
         >
           Entrar
         </Button>
-      </Link> */}
+      </Link>
     </div>
   );
 
@@ -89,7 +89,7 @@ const Navbar = () => {
       >
         Preview
       </a>
-      {/* <Link to="/login" className="block">
+      <Link to="/login" className="block">
         <Button
           variant="outline"
           size="sm"
@@ -98,7 +98,7 @@ const Navbar = () => {
         >
           Entrar
         </Button>
-      </Link> */}
+      </Link>
     </div>
   );
 
