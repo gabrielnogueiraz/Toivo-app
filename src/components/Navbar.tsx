@@ -28,14 +28,14 @@ const Navbar = () => {
   const authLinksDesktop = (
     <div className="hidden md:flex items-center space-x-4">
       <span className="text-sm text-slate-300">Olá, {user?.name?.split(' ')[0]}</span>
-      {/* <Button
+      <Button
         variant="outline"
         size="sm"
         onClick={handleLogout}
         className="border-red-500/30 text-red-300 hover:bg-red-500/10 hover:border-red-400 transition-all duration-200 text-sm px-4 py-2"
       >
         Sair
-      </Button> */}
+      </Button>
     </div>
   );
 
@@ -47,7 +47,7 @@ const Navbar = () => {
       <a href="/#preview" className="text-sm lg:text-base text-slate-300 hover:text-white transition-colors duration-200">
         Preview
       </a>
-      {/* <Link to="/login">
+      <Link to="/login">
         <Button
           variant="outline"
           size="sm"
@@ -55,7 +55,7 @@ const Navbar = () => {
         >
           Entrar
         </Button>
-      </Link> */}
+      </Link>
     </div>
   );
 
@@ -89,7 +89,7 @@ const Navbar = () => {
       >
         Preview
       </a>
-      {/* <Link to="/login" className="block">
+      <Link to="/login" className="block">
         <Button
           variant="outline"
           size="sm"
@@ -98,7 +98,7 @@ const Navbar = () => {
         >
           Entrar
         </Button>
-      </Link> */}
+      </Link>
     </div>
   );
 
