@@ -8,5 +8,7 @@ export * from './usePomodoroSync';
 export * from './useKanbanSync';
 export * from './useNotifications';
 export * from './useWaitlist';
+export * from './useUser';
+export * from './useDebounce';
 export * from './use-mobile';
 export * from './use-toast';
