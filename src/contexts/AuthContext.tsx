@@ -6,7 +6,7 @@ import {
   useCallback,
 } from 'react';
 import { authService } from '@/services/authService';
-import { setAuthToken, getAuthToken } from '@/services/api';
+import { setAuthToken, getAuthToken, getUserData, clearAuthData } from '@/services/api';
 import { User, LoginRequest, RegisterRequest, AuthContextType } from '@/types/auth';
 
 // Um componente de loading simples para exibir enquanto verifica o status da autenticação
@@ -24,23 +24,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const initializeAuth = useCallback(async () => {
     try {
-      // Verifica se há token no localStorage
-      const existingToken = getAuthToken();
+      setLoading(true);
       
-      if (existingToken) {
-        // Se há token, tenta obter dados do usuário
+      // Verifica se há token e dados do usuário salvos
+      const existingToken = getAuthToken();
+      const savedUser = getUserData();
+      
+      if (existingToken && savedUser) {
+        // Se há token e dados salvos, definir o usuário
+        setUser(savedUser);
+        
         try {
-          const currentUser = await authService.getMe();
-          setUser(currentUser);
-          setLoading(false);
-          return;
+          // Tentar fazer refresh para validar/renovar o token
+          const refreshResult = await authService.refreshToken();
+          
+          if (refreshResult.user) {
+            setUser(refreshResult.user);
+          }
         } catch (error) {
-          // Token inválido, limpa o localStorage
-          setAuthToken(null);
+          console.error('Erro ao renovar token na inicialização:', error);
+          // Se falhar o refresh, tentar obter dados do usuário
+          try {
+            const currentUser = await authService.getMe();
+            setUser(currentUser);
+          } catch (getMeError) {
+            console.error('Erro ao obter dados do usuário:', getMeError);
+            // Token inválido, limpar dados
+            clearAuthData();
+            setUser(null);
+          }
         }
       }
     } catch (error) {
       console.error('Erro na inicialização da autenticação:', error);
+      clearAuthData();
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -48,31 +66,76 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     initializeAuth();
+    
+    // Aplicar tema salvo no localStorage se existir
+    const savedTheme = localStorage.getItem('userTheme') as 'default' | 'dark' | 'zen' | null;
+    if (savedTheme) {
+      applyTheme(savedTheme);
+    }
   }, [initializeAuth]);
 
   const handleAuthSuccess = (response: { user: User; accessToken: string }) => {
     setAuthToken(response.accessToken);
     setUser(response.user);
+    
+    // Aplicar tema do usuário se existir
+    if (response.user.theme) {
+      applyTheme(response.user.theme);
+    }
+  };
+
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    
+    // Aplicar tema atualizado
+    if (updatedUser.theme) {
+      applyTheme(updatedUser.theme);
+    }
+  };
+
+  const applyTheme = (theme: 'default' | 'dark' | 'zen') => {
+    const body = document.body;
+    body.classList.remove('theme-default', 'theme-dark', 'theme-zen');
+    body.classList.add(`theme-${theme}`);
+    localStorage.setItem('userTheme', theme);
   };
 
   const login = async (data: LoginRequest) => {
-    const response = await authService.login(data);
-    handleAuthSuccess(response);
+    try {
+      setLoading(true);
+      const response = await authService.login(data);
+      handleAuthSuccess(response);
+    } catch (error) {
+      console.error('Erro no login:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const register = async (data: RegisterRequest) => {
-    const response = await authService.register(data);
-    handleAuthSuccess(response);
+    try {
+      setLoading(true);
+      const response = await authService.register(data);
+      handleAuthSuccess(response);
+    } catch (error) {
+      console.error('Erro no registro:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = async () => {
     try {
+      setLoading(true);
       await authService.logout();
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     } finally {
       setUser(null);
-      setAuthToken(null);
+      clearAuthData();
+      setLoading(false);
     }
   };
 
@@ -83,6 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login,
     register,
     logout,
+    updateUser,
   };
 
   return (
