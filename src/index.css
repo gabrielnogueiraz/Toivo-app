@@ -98,6 +98,54 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  .theme-default {
+    color-scheme: light;
+  }
+
+  .theme-dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9;
+  }
+
+  .theme-zen {
+    --background: 60 9.1% 97.8%;
+    --foreground: 60 9.1% 7.8%;
+    --card: 60 9.1% 97.8%;
+    --card-foreground: 60 9.1% 7.8%;
+    --popover: 60 9.1% 97.8%;
+    --popover-foreground: 60 9.1% 7.8%;
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 60 4.8% 95.9%;
+    --secondary-foreground: 60 9.1% 15.9%;
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 60 5.9% 51.6%;
+    --accent: 60 4.8% 95.9%;
+    --accent-foreground: 60 9.1% 15.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --border: 60 5.9% 91.4%;
+    --input: 60 5.9% 91.4%;
+    --ring: 142.1 76.2% 36.3%;
+  }
 }
 
 @layer base {

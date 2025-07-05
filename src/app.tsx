@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import PomodoroPage from "./pages/PomodoroPage";
 import BoardsPage from "./pages/BoardsPage";
 import Board from "./pages/Board";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/pomodoro" element={<PomodoroPage />} />
               <Route path="/boards" element={<BoardsPage />} />
               <Route path="/board/:boardId" element={<Board />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
