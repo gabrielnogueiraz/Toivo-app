@@ -14,137 +14,171 @@ All colors MUST be HSL.
     --font-heading: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Manrope', sans-serif;
     
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Tema CLARO - cores suaves e acolhedoras */
+    --background: 60 9.1% 97.8%;
+    --foreground: 224 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 224 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 224 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 258 89% 66%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 258 20% 96%;
+    --secondary-foreground: 224 15% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 258 12% 95%;
+    --muted-foreground: 224 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 258 30% 92%;
+    --accent-foreground: 258 89% 66%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 258 15% 90%;
+    --input: 258 15% 92%;
+    --ring: 258 89% 66%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
+    --sidebar-foreground: 224 15% 25%;
+    --sidebar-primary: 258 89% 66%;
     --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 258 20% 96%;
+    --sidebar-accent-foreground: 258 89% 66%;
+    --sidebar-border: 258 15% 88%;
+    --sidebar-ring: 258 89% 66%;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
+  /* Tema PADRÃO (Toivo) - dark roxo característico */
   .theme-default {
-    color-scheme: light;
+    --background: 251 41% 6%;
+    --foreground: 258 30% 95%;
+
+    --card: 251 35% 8%;
+    --card-foreground: 258 25% 92%;
+
+    --popover: 251 35% 8%;
+    --popover-foreground: 258 25% 92%;
+
+    --primary: 258 89% 66%;
+    --primary-foreground: 251 41% 6%;
+
+    --secondary: 251 30% 12%;
+    --secondary-foreground: 258 25% 88%;
+
+    --muted: 251 25% 10%;
+    --muted-foreground: 258 15% 65%;
+
+    --accent: 258 60% 20%;
+    --accent-foreground: 258 89% 66%;
+
+    --destructive: 0 62.8% 55%;
+    --destructive-foreground: 258 30% 95%;
+
+    --border: 251 30% 15%;
+    --input: 251 30% 12%;
+    --ring: 258 89% 66%;
+
+    --sidebar-background: 251 35% 7%;
+    --sidebar-foreground: 258 25% 90%;
+    --sidebar-primary: 258 89% 66%;
+    --sidebar-primary-foreground: 251 41% 6%;
+    --sidebar-accent: 251 30% 12%;
+    --sidebar-accent-foreground: 258 89% 66%;
+    --sidebar-border: 251 25% 15%;
+    --sidebar-ring: 258 89% 66%;
+
+    color-scheme: dark;
   }
 
+  /* Tema ESCURO - all black minimalista */
   .theme-dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9;
+    --background: 0 0% 3%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 92%;
+
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 92%;
+
+    --primary: 0 0% 88%;
+    --primary-foreground: 0 0% 8%;
+
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 85%;
+
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 55%;
+
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 88%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 0 0% 12%;
+    --input: 0 0% 8%;
+    --ring: 0 0% 88%;
+
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 0 0% 88%;
+    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-accent: 0 0% 8%;
+    --sidebar-accent-foreground: 0 0% 88%;
+    --sidebar-border: 0 0% 10%;
+    --sidebar-ring: 0 0% 88%;
+
+    color-scheme: dark;
   }
 
+  /* Tema CLARO (zen) - tons suaves e naturais */
   .theme-zen {
     --background: 60 9.1% 97.8%;
     --foreground: 60 9.1% 7.8%;
-    --card: 60 9.1% 97.8%;
+    
+    --card: 0 0% 100%;
     --card-foreground: 60 9.1% 7.8%;
-    --popover: 60 9.1% 97.8%;
+    
+    --popover: 0 0% 100%;
     --popover-foreground: 60 9.1% 7.8%;
+    
     --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 355.7 100% 97.3%;
+    --primary-foreground: 0 0% 98%;
+    
     --secondary: 60 4.8% 95.9%;
     --secondary-foreground: 60 9.1% 15.9%;
+    
     --muted: 60 4.8% 95.9%;
     --muted-foreground: 60 5.9% 51.6%;
-    --accent: 60 4.8% 95.9%;
-    --accent-foreground: 60 9.1% 15.9%;
+    
+    --accent: 142.1 20% 90%;
+    --accent-foreground: 142.1 76.2% 36.3%;
+    
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 60 9.1% 97.8%;
-    --border: 60 5.9% 91.4%;
+    
+    --border: 60 5.9% 88%;
     --input: 60 5.9% 91.4%;
     --ring: 142.1 76.2% 36.3%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 60 9.1% 25%;
+    --sidebar-primary: 142.1 76.2% 36.3%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 60 4.8% 95.9%;
+    --sidebar-accent-foreground: 142.1 76.2% 36.3%;
+    --sidebar-border: 60 5.9% 86%;
+    --sidebar-ring: 142.1 76.2% 36.3%;
+
+    color-scheme: light;
   }
 }
 
@@ -165,10 +199,25 @@ All colors MUST be HSL.
 
 @layer utilities {
   .gradient-bg {
-    background: radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
-                black;
+    background: radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 60%),
+                hsl(var(--background));
+  }
+  
+  .gradient-bg-toivo {
+    background: radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(124, 58, 237, 0.2) 0%, transparent 60%),
+                hsl(251, 41%, 6%);
+  }
+  
+  .gradient-bg-dark {
+    background: linear-gradient(135deg, hsl(0, 0%, 3%) 0%, hsl(0, 0%, 5%) 50%, hsl(0, 0%, 2%) 100%);
+  }
+  
+  .gradient-bg-zen {
+    background: linear-gradient(135deg, hsl(60, 9.1%, 97.8%) 0%, hsl(142, 20%, 95%) 30%, hsl(60, 9.1%, 96%) 100%);
   }
   
   .glass-effect {
@@ -177,7 +226,20 @@ All colors MUST be HSL.
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   }
   
+  .glass-effect-toivo {
+    background-color: rgba(168, 85, 247, 0.08);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 40px rgba(168, 85, 247, 0.2);
+  }
+  
   .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(258, 89%, 76%) 50%, hsl(258, 89%, 56%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-toivo {
     background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 50%, #7c3aed 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -190,6 +252,25 @@ All colors MUST be HSL.
   
   .hover-glow:hover {
     box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .hover-glow-theme {
+    transition: all 0.3s ease;
+  }
+  
+  .theme-default .hover-glow-theme:hover {
+    box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5);
+    transform: translateY(-2px);
+  }
+  
+  .theme-dark .hover-glow-theme:hover {
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .theme-zen .hover-glow-theme:hover {
+    box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
     transform: translateY(-2px);
   }
 

@@ -30,21 +30,24 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 const themes = [
   {
     value: 'default',
-    label: 'Padrão',
-    description: 'Tema claro e limpo',
-    color: 'bg-blue-500',
+    label: 'Toivo',
+    description: 'Tema característico com dark roxo sofisticado',
+    color: 'bg-gradient-to-br from-purple-600 to-purple-800',
+    preview: 'Dark roxo elegante',
   },
   {
     value: 'dark',
     label: 'Escuro',
-    description: 'Tema escuro para baixa luminosidade',
-    color: 'bg-gray-800',
+    description: 'Tema minimalista all black',
+    color: 'bg-gradient-to-br from-gray-900 to-black',
+    preview: 'Preto e branco',
   },
   {
     value: 'zen',
-    label: 'Zen',
-    description: 'Tema minimalista e relaxante',
-    color: 'bg-green-500',
+    label: 'Claro',
+    description: 'Tema claro e acolhedor',
+    color: 'bg-gradient-to-br from-green-400 to-green-600',
+    preview: 'Tons suaves e naturais',
   },
 ] as const;
 

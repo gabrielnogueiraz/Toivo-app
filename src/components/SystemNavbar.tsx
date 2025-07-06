@@ -30,7 +30,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import Logo from '@/assets/logo.png';
 
 export default function SystemNavbar() {
   const { user, logout } = useAuth();
@@ -87,7 +86,6 @@ export default function SystemNavbar() {
         >
           <div className="px-4 h-14 flex items-center justify-between">
             <Link to="/dashboard" className="flex items-center gap-2">
-              <img src={Logo} alt="Toivo" className="w-7 h-7" />
               <span className="text-lg font-bold text-gradient">Toivo</span>
             </Link>
 
@@ -98,7 +96,7 @@ export default function SystemNavbar() {
                   className="relative h-8 w-8 rounded-full hover:bg-accent"
                 >
                   <Avatar className="h-7 w-7">
-                    <AvatarImage alt={user?.name} />
+                    <AvatarImage src={user?.profileImage || ''} alt={user?.name} />
                     <AvatarFallback className="bg-primary/10 text-primary text-xs">
                       {user?.name ? getInitials(user.name) : 'U'}
                     </AvatarFallback>
@@ -209,7 +207,6 @@ export default function SystemNavbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/dashboard" className="flex items-center gap-3">
-            <img src={Logo} alt="Toivo" className="w-8 h-8" />
             <span className="text-xl font-bold text-gradient">Toivo</span>
           </Link>
 
@@ -248,7 +245,7 @@ export default function SystemNavbar() {
                 className="relative h-9 w-9 rounded-full hover:bg-accent"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage alt={user?.name} />
+                  <AvatarImage src={user?.profileImage || ''} alt={user?.name} />
                   <AvatarFallback className="bg-primary/10 text-primary">
                     {user?.name ? getInitials(user.name) : 'U'}
                   </AvatarFallback>
