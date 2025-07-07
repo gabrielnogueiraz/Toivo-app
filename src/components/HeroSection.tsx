@@ -6,7 +6,7 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
       {/* Background Effects */}
-      <div className="absolute inset-0 gradient-bg" />
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-900" />
       
       {/* Floating particles */}
       <div className="absolute inset-0">
