@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, RotateCcw, Settings, Clock, Target, TrendingUp } from 'lucide-react';
 import { PomodoroTimer } from '@/components/PomodoroTimer';
+import TaskSelector from '@/components/TaskSelector';
 import { useActivePomodoro, useStartPomodoro, usePausePomodoro, useFinishPomodoro } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,12 +38,9 @@ export default function PomodoroPage() {
     if (activePomodoro) {
       setIsRunning(true);
     } else {
-      // Para demonstração, vamos usar uma tarefa mock
-      startPomodoro({
-        taskId: 'mock-task-id',
-        duration: mode === 'work' ? 25 : mode === 'shortBreak' ? 5 : 15,
-        breakTime: mode === 'work' ? 5 : 0,
-      });
+      // Agora a seleção de tarefa é feita pelo TaskSelector
+      // que já tem a funcionalidade de iniciar o pomodoro
+      console.log('Selecione uma tarefa primeiro');
     }
   };
 
@@ -303,25 +301,13 @@ export default function PomodoroPage() {
           </motion.div>
         </div>
 
-        {/* Histórico Recente */}
+        {/* Seleção de Tarefas */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base md:text-lg">Histórico Recente</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-6 md:py-8">
-                <Clock className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground text-sm md:text-base">
-                  Inicie seu primeiro pomodoro para ver o histórico aqui
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <TaskSelector />
         </motion.div>
       </div>
     </div>

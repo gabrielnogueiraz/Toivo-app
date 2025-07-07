@@ -4,6 +4,7 @@ export * from './useColumns';
 export * from './useTasks';
 export * from './usePomodoro';
 export * from './usePomodoroTimer';
+export * from './usePomodoroTasks';
 export * from './usePomodoroSync';
 export * from './useKanbanSync';
 export * from './useNotifications';
