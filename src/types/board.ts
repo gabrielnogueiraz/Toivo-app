@@ -16,6 +16,19 @@ export interface Task {
   updatedAt: string;
 }
 
+// Tipo específico para tarefas retornadas pela API de pomodoro
+export interface PomodoroTask extends Task {
+  board?: {
+    id: string;
+    title: string;
+  };
+  column?: {
+    id: string;
+    title: string;
+  };
+  completedPomodoros?: number;
+}
+
 export interface Column {
   id: string;
   title: string;
