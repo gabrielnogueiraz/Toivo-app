@@ -5,10 +5,9 @@ import WaitlistInput from '@/components/ui/waitlistInput';
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-900" />
+      {/* Removendo background duplicado pois já está na página principal */}
       
-      {/* Floating particles */}
+      {/* Floating particles locais (podem ser removidas se ficarem muitas) */}
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-1 h-1 sm:w-2 sm:h-2 bg-purple-500 rounded-full animate-float opacity-60" />
         <div className="absolute top-1/3 right-1/3 w-0.5 h-0.5 sm:w-1 sm:h-1 bg-violet-400 rounded-full animate-float opacity-40" style={{animationDelay: '1s'}} />
