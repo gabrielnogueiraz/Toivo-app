@@ -13,9 +13,15 @@ import { cn } from '@/lib/utils';
 
 interface TaskSelectorProps {
   onTaskSelect?: (task: PomodoroTask) => void;
+  currentMode?: 'work' | 'shortBreak' | 'longBreak';
+  settings?: {
+    focusDuration: number;
+    shortBreakTime: number;
+    longBreakTime: number;
+  };
 }
 
-export function TaskSelector({ onTaskSelect }: TaskSelectorProps) {
+export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: TaskSelectorProps) {
   const [search, setSearch] = useState('');
   const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'ALL'>('ALL');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -34,10 +40,21 @@ export function TaskSelector({ onTaskSelect }: TaskSelectorProps) {
   };
 
   const handleStartPomodoro = (task: PomodoroTask) => {
+    // Usar as configurações do usuário baseado no modo atual
+    const duration = settings 
+      ? (currentMode === 'work' 
+          ? settings.focusDuration 
+          : currentMode === 'shortBreak' 
+          ? settings.shortBreakTime 
+          : settings.longBreakTime)
+      : (currentMode === 'work' ? 25 : currentMode === 'shortBreak' ? 5 : 15);
+
+    const breakTime = settings?.shortBreakTime || 5;
+
     startPomodoro({
       taskId: task.id,
-      duration: 25, // 25 minutos padrão
-      breakTime: 5, // 5 minutos de pausa padrão
+      duration,
+      breakTime,
     });
   };
 
@@ -82,178 +99,254 @@ export function TaskSelector({ onTaskSelect }: TaskSelectorProps) {
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <CardTitle className="text-base md:text-lg flex items-center gap-2">
-            <Target className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
-            <span className="truncate">Selecionar Tarefa para Pomodoro</span>
-          </CardTitle>
-          <Badge variant="outline" className="text-xs self-start sm:self-center flex-shrink-0">
-            {tasks.length} {tasks.length === 1 ? 'tarefa' : 'tarefas'}
-          </Badge>
+      {/* Header */}
+      <CardHeader className="pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+              <Target className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">
+                Selecionar Tarefa
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Escolha uma tarefa para iniciar seu pomodoro
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="text-xs">
+              {tasks.length} {tasks.length === 1 ? 'tarefa' : 'tarefas'}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3 md:space-y-4">
+      <CardContent className="space-y-6">
         {/* Barra de Busca */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-200" />
           <Input
-            placeholder="Buscar tarefas..."
+            placeholder="Buscar por título, descrição..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 text-sm"
+            className="pl-12 pr-4 py-3 text-sm rounded-xl focus:ring-2 focus:ring-primary/20 transition-all duration-200"
           />
         </div>
 
-        {/* Filtros Expansíveis */}
-        <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                <span>Filtros {priority !== 'ALL' && `(${getPriorityLabel(priority)})`}</span>
+        {/* Filtros e Configuração */}
+        <div className="space-y-4">
+          {/* Filtros Expansíveis */}
+          <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+            <CollapsibleTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full justify-between rounded-xl hover:bg-muted transition-all duration-200"
+              >
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4" />
+                  <span>Filtros {priority !== 'ALL' && `(${getPriorityLabel(priority)})`}</span>
+                </div>
+                <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", isFiltersOpen && "rotate-180")} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-4">
+              <div className="bg-muted/50 rounded-xl p-4">
+                <label className="text-sm font-medium mb-3 block">Prioridade</label>
+                <Select value={priority} onValueChange={(value) => setPriority(value as any)}>
+                  <SelectTrigger className="rounded-lg">
+                    <SelectValue placeholder="Todas as prioridades" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">Todas as prioridades</SelectItem>
+                    <SelectItem value="HIGH">🔥 Alta</SelectItem>
+                    <SelectItem value="MEDIUM">⚡ Média</SelectItem>
+                    <SelectItem value="LOW">🌱 Baixa</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <ChevronDown className={cn("w-4 h-4 transition-transform", isFiltersOpen && "rotate-180")} />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3 pt-3">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Prioridade</label>
-              <Select value={priority} onValueChange={(value) => setPriority(value as any)}>
-                <SelectTrigger className="text-sm">
-                  <SelectValue placeholder="Todas as prioridades" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Todas as prioridades</SelectItem>
-                  <SelectItem value="HIGH">Alta</SelectItem>
-                  <SelectItem value="MEDIUM">Média</SelectItem>
-                  <SelectItem value="LOW">Baixa</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Informações de Configuração do Pomodoro */}
+          {settings && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-primary/5 border border-primary/20 rounded-xl p-4"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <Timer className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold">
+                    Configuração Atual
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    {currentMode === 'work' ? '🎯 Modo Foco' : currentMode === 'shortBreak' ? '☕ Pausa Curta' : '🌟 Pausa Longa'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Duração configurada:</span>
+                <span className="text-lg font-bold text-primary">
+                  {currentMode === 'work' 
+                    ? settings.focusDuration 
+                    : currentMode === 'shortBreak' 
+                    ? settings.shortBreakTime 
+                    : settings.longBreakTime} min
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </div>
 
         {/* Lista de Tarefas */}
-        <div className="space-y-2 md:space-y-3">
+        <div className="space-y-3">
           {isLoading && (
-            <div className="text-center py-6 md:py-8">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Carregando tarefas...</p>
+            <div className="text-center py-12">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"
+              />
+              <p className="text-sm text-muted-foreground">Carregando suas tarefas...</p>
             </div>
           )}
 
           {error && (
-            <div className="text-center py-6 md:py-8">
-              <p className="text-sm text-red-600 mb-2">Erro ao carregar tarefas</p>
-              <Button variant="outline" size="sm" className="text-xs" onClick={() => window.location.reload()}>
+            <div className="text-center py-12">
+              <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-6 h-6 text-destructive" />
+              </div>
+              <p className="text-sm text-destructive mb-4">Erro ao carregar tarefas</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => window.location.reload()}
+                className="rounded-lg"
+              >
                 Tentar novamente
               </Button>
             </div>
           )}
 
           {!isLoading && !error && tasks.length === 0 && (
-            <div className="text-center py-6 md:py-8">
-              <Target className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <p className="text-sm text-muted-foreground mb-2">
-                {search || priority !== 'ALL' ? 'Nenhuma tarefa encontrada com os filtros aplicados' : 'Nenhuma tarefa disponível'}
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Target className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">
+                {search || priority !== 'ALL' ? 'Nenhuma tarefa encontrada' : 'Nenhuma tarefa disponível'}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                {search || priority !== 'ALL' 
+                  ? 'Tente ajustar os filtros de busca' 
+                  : 'Crie algumas tarefas no seu quadro Kanban primeiro!'}
               </p>
               {search || priority !== 'ALL' ? (
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="text-xs"
                   onClick={() => {
                     setSearch('');
                     setPriority('ALL');
                   }}
+                  className="rounded-lg"
                 >
                   Limpar filtros
                 </Button>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Crie algumas tarefas no seu quadro Kanban primeiro!
-                </p>
-              )}
+              ) : null}
             </div>
           )}
 
-          {!isLoading && !error && tasks.map((task) => (
+          {!isLoading && !error && tasks.map((task, index) => (
             <motion.div
               key={task.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
               className={cn(
-                "border rounded-lg p-3 md:p-4 cursor-pointer transition-all duration-200 hover:shadow-md touch-target",
-                selectedTaskId === task.id 
-                  ? "border-primary bg-primary/5 shadow-sm" 
-                  : "border-border hover:border-primary/50"
+                "group relative overflow-hidden rounded-2xl transition-all duration-300 cursor-pointer",
+                "bg-card border border-border",
+                "hover:shadow-lg hover:border-primary/30",
+                selectedTaskId === task.id && "ring-2 ring-primary/50 bg-primary/5"
               )}
               onClick={() => handleTaskSelect(task)}
             >
-              <div className="flex flex-col gap-3">
-                {/* Header da tarefa */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2 mb-1">
-                      <h4 className="font-medium text-sm md:text-base line-clamp-2 flex-1">
-                        {task.title}
-                      </h4>
-                      <Badge 
-                        variant="outline" 
-                        className={cn("text-xs flex items-center gap-1 flex-shrink-0", getPriorityColor(task.priority))}
-                      >
-                        {getPriorityIcon(task.priority)}
-                        {getPriorityLabel(task.priority)}
-                      </Badge>
+              <div className="p-5">
+                <div className="flex flex-col gap-4">
+                  {/* Header da tarefa */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-3 mb-2">
+                        <h4 className="font-semibold text-base line-clamp-2 flex-1 group-hover:text-primary transition-colors duration-200">
+                          {task.title}
+                        </h4>
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "text-xs flex items-center gap-1.5 px-2.5 py-1 flex-shrink-0 rounded-full font-medium",
+                            getPriorityColor(task.priority)
+                          )}
+                        >
+                          {getPriorityIcon(task.priority)}
+                          {getPriorityLabel(task.priority)}
+                        </Badge>
+                      </div>
+
+                      {task.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
+                          {task.description}
+                        </p>
+                      )}
                     </div>
-
-                    {task.description && (
-                      <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mb-2">
-                        {task.description}
-                      </p>
-                    )}
                   </div>
-                </div>
 
-                {/* Metadados e Ação */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Kanban className="w-3 h-3 flex-shrink-0" />
-                      <span className="truncate max-w-[120px] sm:max-w-none">
-                        {task.board?.title || 'Sem board'}
-                      </span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FileText className="w-3 h-3 flex-shrink-0" />
-                      <span className="truncate max-w-[100px] sm:max-w-none">
-                        {task.column?.title || 'Sem coluna'}
-                      </span>
-                    </span>
-                    {task.completedPomodoros !== undefined && (
-                      <span className="flex items-center gap-1">
-                        <Timer className="w-3 h-3 flex-shrink-0" />
-                        <span className="whitespace-nowrap">
-                          {task.completedPomodoros} pomodoros
+                  {/* Metadados e Ação */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <Kanban className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="truncate max-w-[120px] sm:max-w-none">
+                          {task.board?.title || 'Sem board'}
                         </span>
                       </span>
-                    )}
-                  </div>
+                      <span className="flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="truncate max-w-[100px] sm:max-w-none">
+                          {task.column?.title || 'Sem coluna'}
+                        </span>
+                      </span>
+                      {task.completedPomodoros !== undefined && (
+                        <span className="flex items-center gap-1.5">
+                          <Timer className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span className="whitespace-nowrap">
+                            {task.completedPomodoros} pomodoros
+                          </span>
+                        </span>
+                      )}
+                    </div>
 
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleStartPomodoro(task);
-                    }}
-                    disabled={isStarting}
-                    className="text-xs px-3 py-1.5 h-auto self-start sm:self-center flex-shrink-0"
-                  >
-                    <Clock className="w-3 h-3 mr-1" />
-                    {isStarting ? 'Iniciando...' : 'Iniciar'}
-                  </Button>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartPomodoro(task);
+                      }}
+                      disabled={isStarting}
+                      className={cn(
+                        "px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex-shrink-0",
+                        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl",
+                        "disabled:opacity-50 disabled:cursor-not-allowed",
+                        "group-hover:scale-105"
+                      )}
+                    >
+                      <Clock className="w-4 h-4 mr-2" />
+                      {isStarting ? 'Iniciando...' : 'Iniciar Pomodoro'}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </motion.div>

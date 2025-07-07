@@ -5,6 +5,8 @@ export * from './useTasks';
 export * from './usePomodoro';
 export * from './usePomodoroTimer';
 export * from './usePomodoroTasks';
+export * from './usePomodoroSettings';
+export * from './useEffectivePomodoroSettings';
 export * from './usePomodoroSync';
 export * from './useKanbanSync';
 export * from './useNotifications';
