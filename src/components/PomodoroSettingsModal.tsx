@@ -74,41 +74,35 @@ export function PomodoroSettingsModal({
       key: 'focusDuration' as const,
       label: 'Tempo de Foco',
       description: 'Duração da sessão de trabalho',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
       isActive: currentMode === 'work'
     },
     {
       key: 'shortBreakTime' as const,
       label: 'Pausa Curta',
       description: 'Duração da pausa curta',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
       isActive: currentMode === 'shortBreak'
     },
     {
       key: 'longBreakTime' as const,
       label: 'Pausa Longa',
       description: 'Duração da pausa longa',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
       isActive: currentMode === 'longBreak'
     }
   ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-2xl">
+      <DialogContent className="sm:max-w-lg bg-card border shadow-lg">
         <DialogHeader className="pb-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-              <Settings className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+              <Settings className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              <DialogTitle className="text-xl font-semibold text-foreground">
                 Configurações do Pomodoro
               </DialogTitle>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Personalize seus tempos de foco e descanso
               </p>
             </div>
@@ -121,18 +115,18 @@ export function PomodoroSettingsModal({
               key={config.key}
               className={cn(
                 "relative overflow-hidden rounded-2xl border-2 transition-all duration-300",
-                "bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900",
+                "bg-card",
                 config.isActive 
-                  ? "border-blue-300 dark:border-blue-600 shadow-lg shadow-blue-500/20"
-                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                  ? "border-primary shadow-lg shadow-primary/20"
+                  : "border-border hover:border-primary/50"
               )}
             >
               {/* Indicador de modo ativo */}
               {config.isActive && (
                 <div className="absolute top-3 right-3">
-                  <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Ativo</span>
+                  <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 rounded-full">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                    <span className="text-xs font-medium text-primary">Ativo</span>
                   </div>
                 </div>
               )}
@@ -141,18 +135,18 @@ export function PomodoroSettingsModal({
                 <div className="flex items-center gap-3 mb-4">
                   <div className={cn(
                     "w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-sm",
-                    config.isActive ? "bg-gradient-to-r from-blue-500 to-purple-500" : "bg-slate-400"
+                    config.isActive ? "bg-primary" : "bg-muted-foreground"
                   )}>
                     {config.key === 'focusDuration' ? '🎯' : config.key === 'shortBreakTime' ? '☕' : '🌟'}
                   </div>
                   <div className="flex-1">
                     <h3 className={cn(
                       "font-semibold text-base",
-                      config.isActive ? "text-blue-700 dark:text-blue-300" : "text-slate-700 dark:text-slate-300"
+                      config.isActive ? "text-primary" : "text-foreground"
                     )}>
                       {config.label}
                     </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm text-muted-foreground">
                       {config.description}
                     </p>
                   </div>
@@ -176,9 +170,9 @@ export function PomodoroSettingsModal({
                       max="120"
                       value={localSettings[config.key]}
                       onChange={(e) => handleInputChange(config.key, e.target.value)}
-                      className="text-center text-xl font-bold h-14 border-2 rounded-xl bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-blue-500/20"
+                      className="text-center text-xl font-bold h-14 border-2 rounded-xl bg-background focus:ring-2 focus:ring-primary/20"
                     />
-                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-slate-500 dark:text-slate-400 font-medium">
+                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-muted-foreground font-medium">
                       min
                     </span>
                   </div>
@@ -198,7 +192,7 @@ export function PomodoroSettingsModal({
           ))}
         </div>
 
-        <div className="flex gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex gap-3 pt-6 border-t border-border">
           <Button
             variant="outline"
             onClick={onClose}
@@ -209,11 +203,11 @@ export function PomodoroSettingsModal({
           <Button
             onClick={handleSave}
             disabled={isPending}
-            className="flex-1 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+            className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg hover:shadow-xl transition-all duration-200"
           >
             {isPending ? (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 Salvando...
               </div>
             ) : (

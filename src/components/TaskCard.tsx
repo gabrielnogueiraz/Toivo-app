@@ -2,14 +2,20 @@ import { forwardRef, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Play, Pause, MoreHorizontal, Calendar, Flag } from 'lucide-react';
+import { Clock, Play, Pause, MoreHorizontal, Calendar, Flag, Edit2, Trash2 } from 'lucide-react';
 import { Task } from '@/types/board';
 import { cn, formatRelativeTime, getPriorityColor } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { useActivePomodoro, useStartPomodoro } from '@/hooks';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { useActivePomodoro, useStartPomodoro, useDeleteTask } from '@/hooks';
 
 interface TaskCardProps {
   task: Task;
@@ -22,8 +28,10 @@ interface TaskCardProps {
 export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
   ({ task, isActive, isDragging, onEdit, onDelete, ...props }, ref) => {
     const [isHovered, setIsHovered] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { data: activePomodoro } = useActivePomodoro();
     const { mutate: startPomodoro } = useStartPomodoro();
+    const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
     
     const {
       attributes,
@@ -51,6 +59,19 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
           breakTime: 5,
         });
       }
+    };
+
+    const handleDeleteTask = () => {
+      deleteTask(task.id, {
+        onSuccess: () => {
+          onDelete?.(task.id);
+        }
+      });
+    };
+
+    const handleEditTask = () => {
+      onEdit?.(task);
+      setIsMenuOpen(false);
     };
 
     const getPriorityBadge = () => {
@@ -135,7 +156,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
               </div>
 
               <AnimatePresence>
-                {(isHovered || isTaskActive) && (
+                {(isHovered || isTaskActive || isMenuOpen) && (
                   <motion.div
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -164,14 +185,32 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
                       </motion.div>
                     )}
                     
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => onEdit?.(task)}
-                      className="h-6 w-6 p-0 touch-target"
-                    >
-                      <MoreHorizontal className="w-3 h-3" />
-                    </Button>
+                    <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0 touch-target"
+                          disabled={isDeleting}
+                        >
+                          <MoreHorizontal className="w-3 h-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={handleEditTask}>
+                          <Edit2 className="w-4 h-4 mr-2" />
+                          Editar tarefa
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={handleDeleteTask}
+                          disabled={isDeleting}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          {isDeleting ? 'Deletando...' : 'Deletar tarefa'}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </motion.div>
                 )}
               </AnimatePresence>
