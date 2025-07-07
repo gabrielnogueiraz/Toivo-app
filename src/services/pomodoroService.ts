@@ -17,6 +17,23 @@ export interface PomodoroTasksResponse {
   tasks: PomodoroTask[];
 }
 
+// Interfaces para configurações de pomodoro
+export interface PomodoroSettings {
+  id: string;
+  focusDuration: number;
+  shortBreakTime: number;
+  longBreakTime: number;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdatePomodoroSettingsRequest {
+  focusDuration?: number;
+  shortBreakTime?: number;
+  longBreakTime?: number;
+}
+
 export const getPomodoros = async (): Promise<Pomodoro[]> => {
   const response = await apiClient.get<ApiResponse<Pomodoro[]>>('/pomodoros');
   return response.data.data;
@@ -64,6 +81,16 @@ export const getPomodoroTasks = async (params?: PomodoroTasksParams): Promise<Po
   return response.data.data.tasks;
 };
 
+export const getPomodoroSettings = async (): Promise<PomodoroSettings> => {
+  const response = await apiClient.get<ApiResponse<PomodoroSettings>>('/pomodoro/settings');
+  return response.data.data;
+};
+
+export const updatePomodoroSettings = async (data: UpdatePomodoroSettingsRequest): Promise<PomodoroSettings> => {
+  const response = await apiClient.put<ApiResponse<PomodoroSettings>>('/pomodoro/settings', data);
+  return response.data.data;
+};
+
 export const pomodoroService = {
   getPomodoros,
   getPomodoro,
@@ -73,4 +100,6 @@ export const pomodoroService = {
   resumePomodoro,
   finishPomodoro,
   getPomodoroTasks,
+  getPomodoroSettings,
+  updatePomodoroSettings,
 };

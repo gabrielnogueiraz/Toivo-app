@@ -1,25 +1,29 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, RotateCcw, Settings, Clock, Target, TrendingUp } from 'lucide-react';
-import { PomodoroTimer } from '@/components/PomodoroTimer';
-import TaskSelector from '@/components/TaskSelector';
+import { motion } from 'framer-motion';
+import { Clock, Target, TrendingUp } from 'lucide-react';
+import { TaskSelector } from '@/components/TaskSelector';
+import { EnhancedTimerDisplay } from '@/components/EnhancedTimerDisplay';
+import { PomodoroSettingsModal } from '@/components/PomodoroSettingsModal';
 import { useActivePomodoro, useStartPomodoro, usePausePomodoro, useFinishPomodoro } from '@/hooks';
+import { useEffectivePomodoroSettings } from '@/hooks/useEffectivePomodoroSettings';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 
 export default function PomodoroPage() {
   const { data: activePomodoro } = useActivePomodoro();
+  const { settings } = useEffectivePomodoroSettings();
   const { mutate: startPomodoro } = useStartPomodoro();
   const { mutate: pausePomodoro } = usePausePomodoro();
   const { mutate: finishPomodoro } = useFinishPomodoro();
   
   const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutos default
+  const [totalTime, setTotalTime] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [mode, setMode] = useState<'work' | 'shortBreak' | 'longBreak'>('work');
   const [sessionCount, setSessionCount] = useState(1);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const [todayStats, setTodayStats] = useState({
     completedPomodoros: 0,
@@ -28,18 +32,43 @@ export default function PomodoroPage() {
     streak: 0
   });
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  // Atualizar tempos baseado nas configurações do usuário
+  useEffect(() => {
+    if (settings && !activePomodoro) {
+      const duration = mode === 'work' 
+        ? settings.focusDuration 
+        : mode === 'shortBreak' 
+        ? settings.shortBreakTime 
+        : settings.longBreakTime;
+      
+      const timeInSeconds = duration * 60;
+      setTimeLeft(timeInSeconds);
+      setTotalTime(timeInSeconds);
+    }
+  }, [settings, mode, activePomodoro]);
+
+  // Sincronizar com pomodoro ativo
+  useEffect(() => {
+    if (activePomodoro) {
+      setIsRunning(activePomodoro.status === 'IN_PROGRESS');
+      
+      // Calcular tempo restante baseado no pomodoro ativo
+      const now = new Date();
+      const startedAt = new Date(activePomodoro.startedAt);
+      const elapsed = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
+      const totalDuration = activePomodoro.duration * 60;
+      const remaining = Math.max(0, totalDuration - elapsed);
+      
+      setTimeLeft(remaining);
+      setTotalTime(totalDuration);
+    }
+  }, [activePomodoro]);
 
   const handleStart = () => {
     if (activePomodoro) {
       setIsRunning(true);
     } else {
       // Agora a seleção de tarefa é feita pelo TaskSelector
-      // que já tem a funcionalidade de iniciar o pomodoro
       console.log('Selecione uma tarefa primeiro');
     }
   };
@@ -56,13 +85,50 @@ export default function PomodoroPage() {
       finishPomodoro(activePomodoro.id);
     }
     setIsRunning(false);
-    setTimeLeft(mode === 'work' ? 25 * 60 : mode === 'shortBreak' ? 5 * 60 : 15 * 60);
+    
+    // Resetar para configurações do usuário
+    if (settings) {
+      const duration = mode === 'work' 
+        ? settings.focusDuration 
+        : mode === 'shortBreak' 
+        ? settings.shortBreakTime 
+        : settings.longBreakTime;
+      
+      const timeInSeconds = duration * 60;
+      setTimeLeft(timeInSeconds);
+      setTotalTime(timeInSeconds);
+    }
+  };
+
+  const handlePlayPause = () => {
+    if (isRunning) {
+      handlePause();
+    } else {
+      handleStart();
+    }
   };
 
   const handleSwitchMode = (newMode: 'work' | 'shortBreak' | 'longBreak') => {
+    // Não permitir mudança de modo se há um pomodoro ativo
+    if (activePomodoro) {
+      console.log('Não é possível mudar de modo com pomodoro ativo');
+      return;
+    }
+    
     setMode(newMode);
     setIsRunning(false);
-    setTimeLeft(newMode === 'work' ? 25 * 60 : newMode === 'shortBreak' ? 5 * 60 : 15 * 60);
+    
+    if (settings) {
+      const duration = newMode === 'work' 
+        ? settings.focusDuration 
+        : newMode === 'shortBreak' 
+        ? settings.shortBreakTime 
+        : settings.longBreakTime;
+      
+      const timeInSeconds = duration * 60;
+      setTimeLeft(timeInSeconds);
+      setTotalTime(timeInSeconds);
+    }
   };
 
   const getModeLabel = () => {
@@ -83,9 +149,9 @@ export default function PomodoroPage() {
       case 'work':
         return 'bg-primary';
       case 'shortBreak':
-        return 'bg-green-500';
+        return 'bg-emerald-500';
       case 'longBreak':
-        return 'bg-blue-500';
+        return 'bg-purple-500';
       default:
         return 'bg-primary';
     }
@@ -108,208 +174,158 @@ export default function PomodoroPage() {
   }, [isRunning, timeLeft]);
 
   return (
-    <div className="h-full p-4 md:p-6">
+    <div className="h-full">
+      {/* Header Section - Seguindo o padrão do Dashboard/Boards */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-6 md:mb-8"
+        className="flex flex-col md:flex-row md:items-center justify-between p-4 md:p-6 border-b gap-4"
       >
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">Timer Pomodoro</h1>
-        <p className="text-muted-foreground text-sm md:text-base">
-          Mantenha o foco e aumente sua produtividade
-        </p>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Timer Pomodoro</h1>
+          <p className="text-muted-foreground text-sm md:text-base">
+            Transforme sua produtividade com foco e elegância
+          </p>
+        </div>
       </motion.div>
 
-      <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-        {/* Timer Principal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="text-center">
-            <CardHeader>
-              <div className="flex items-center justify-center gap-2">
-                <Badge variant="outline" className={cn("text-white", getModeColor())}>
-                  {getModeLabel()}
-                </Badge>
-                <Badge variant="secondary">
-                  Sessão {sessionCount}
-                </Badge>
-              </div>
-              {activePomodoro?.task && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  Trabalhando em: {activePomodoro.task.title}
-                </p>
-              )}
-            </CardHeader>
+      {/* Main Content */}
+      <div className="p-4 md:p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="space-y-8">
             
-            <CardContent className="space-y-6">
-              <div className="relative">
-                <div className="text-4xl md:text-6xl font-mono font-bold text-primary mb-4">
-                  {formatTime(timeLeft)}
+            {/* Timer Section - Centralizado */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="w-full"
+            >
+              <Card className="p-6 md:p-8 w-full">
+                <div className="relative z-10">
+                  {/* Mode and Session Info */}
+                  <div className="flex items-center justify-center gap-3 mb-6">
+                    <div className={cn(
+                      "px-4 py-2 rounded-full text-sm font-medium text-white shadow-lg transition-all duration-300",
+                      getModeColor(),
+                      "hover:scale-105"
+                    )}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        {getModeLabel()}
+                      </div>
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-muted text-sm text-muted-foreground">
+                      Sessão {sessionCount}
+                    </div>
+                  </div>
+
+                  {/* Active Task Display */}
+                  {activePomodoro?.task && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-center mb-6"
+                    >
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted rounded-full">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span className="text-sm text-muted-foreground">
+                          Trabalhando em:
+                        </span>
+                        <span className="text-sm font-medium">
+                          {activePomodoro.task.title}
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Enhanced Timer Display */}
+                  <div className="flex justify-center mb-8">
+                    <EnhancedTimerDisplay
+                      timeLeft={timeLeft}
+                      totalTime={totalTime}
+                      isRunning={isRunning}
+                      mode={mode}
+                      onStart={handleStart}
+                      onPause={handlePause}
+                      onReset={handleReset}
+                      onOpenSettings={() => setIsSettingsOpen(true)}
+                    />
+                  </div>
+
+                  {/* Mode Selector - Clean Design */}
+                  <div className="flex items-center justify-center">
+                    <div className="inline-flex items-center bg-muted p-1 rounded-full">
+                      <Button
+                        variant={mode === 'work' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => handleSwitchMode('work')}
+                        disabled={!!activePomodoro}
+                        className={cn(
+                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                          mode === 'work' 
+                            ? "bg-primary text-primary-foreground shadow-lg hover:bg-primary/90" 
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        🎯 Foco
+                      </Button>
+                      <Button
+                        variant={mode === 'shortBreak' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => handleSwitchMode('shortBreak')}
+                        disabled={!!activePomodoro}
+                        className={cn(
+                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                          mode === 'shortBreak' 
+                            ? "bg-emerald-500 text-white shadow-lg hover:bg-emerald-600" 
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        ☕ Pausa
+                      </Button>
+                      <Button
+                        variant={mode === 'longBreak' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => handleSwitchMode('longBreak')}
+                        disabled={!!activePomodoro}
+                        className={cn(
+                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                          mode === 'longBreak' 
+                            ? "bg-purple-500 text-white shadow-lg hover:bg-purple-600" 
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        🌟 Descanso
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="flex items-center justify-center gap-3 md:gap-4">
-                  <Button
-                    size="lg"
-                    onClick={isRunning ? handlePause : handleStart}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full touch-target"
-                  >
-                    {isRunning ? (
-                      <Pause className="w-5 h-5 md:w-6 md:h-6" />
-                    ) : (
-                      <Play className="w-5 h-5 md:w-6 md:h-6" />
-                    )}
-                  </Button>
-                  
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={handleReset}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full touch-target"
-                  >
-                    <RotateCcw className="w-5 h-5 md:w-6 md:h-6" />
-                  </Button>
-                  
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-full touch-target"
-                  >
-                    <Settings className="w-5 h-5 md:w-6 md:h-6" />
-                  </Button>
-                </div>
-              </div>
+              </Card>
+            </motion.div>
 
-              <div className="flex items-center justify-center gap-2 md:gap-4">
-                <Button
-                  variant={mode === 'work' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleSwitchMode('work')}
-                  className="text-xs md:text-sm touch-target"
-                >
-                  Foco
-                </Button>
-                <Button
-                  variant={mode === 'shortBreak' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleSwitchMode('shortBreak')}
-                  className="text-xs md:text-sm touch-target"
-                >
-                  Pausa Curta
-                </Button>
-                <Button
-                  variant={mode === 'longBreak' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleSwitchMode('longBreak')}
-                  className="text-xs md:text-sm touch-target"
-                >
-                  Pausa Longa
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Estatísticas do Dia */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="touch-target">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
-                  Pomodoros Hoje
-                </CardTitle>
-                <Clock className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">{todayStats.completedPomodoros}</div>
-                <p className="text-xs text-muted-foreground">
-                  +{sessionCount} esta sessão
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="touch-target">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
-                  Tempo Focado
-                </CardTitle>
-                <Target className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">
-                  {Math.floor(todayStats.totalFocusTime / 60)}h {todayStats.totalFocusTime % 60}m
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  hoje
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="touch-target">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
-                  Tarefas Concluídas
-                </CardTitle>
-                <Target className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">{todayStats.completedTasks}</div>
-                <p className="text-xs text-muted-foreground">
-                  hoje
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Card className="touch-target">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
-                  Sequência
-                </CardTitle>
-                <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">{todayStats.streak}</div>
-                <p className="text-xs text-muted-foreground">
-                  dias consecutivos
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+            {/* Task Selector - Centralizado abaixo do timer */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="w-full"
+            >
+              <TaskSelector 
+                currentMode={mode}
+                settings={settings}
+              />
+            </motion.div>
+          </div>
         </div>
-
-        {/* Seleção de Tarefas */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <TaskSelector />
-        </motion.div>
       </div>
+
+      {/* Modal de Configurações */}
+      <PomodoroSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        currentMode={mode}
+      />
     </div>
   );
 }
