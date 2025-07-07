@@ -188,8 +188,18 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family: var(--font-body);
+    background: hsl(var(--background));
+  }
+
+  /* Forçar background da landing page */
+  .landing-page-bg {
+    background: radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 60%),
+                #0a0a0a !important;
+    color: white;
   }
 
   h1, h2, h3, h4, h5, h6 {
