@@ -13,6 +13,7 @@ import PomodoroPage from "./pages/PomodoroPage";
 import BoardsPage from "./pages/BoardsPage";
 import Board from "./pages/Board";
 import Profile from "./pages/Profile";
+import GardenPage from "./pages/GardenPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/pomodoro" element={<PomodoroPage />} />
               <Route path="/boards" element={<BoardsPage />} />
               <Route path="/board/:boardId" element={<Board />} />
+              <Route path="/garden" element={<GardenPage />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             
