@@ -10,6 +10,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { usePomodoroTasks, useStartPomodoro } from '@/hooks';
 import { PomodoroTask } from '@/types/board';
 import { cn } from '@/lib/utils';
+import { TaskFlowerIndicator } from './TaskFlowerIndicator';
+import { CompleteTaskButton } from './CompleteTaskButton';
+import { TaskWithFlowerState } from '../types/taskFlower';
 
 interface TaskSelectorProps {
   onTaskSelect?: (task: PomodoroTask) => void;
@@ -285,6 +288,18 @@ export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: T
                         <h4 className="font-semibold text-base line-clamp-2 flex-1 group-hover:text-primary transition-colors duration-200">
                           {task.title}
                         </h4>
+                        <TaskFlowerIndicator 
+                          task={{
+                            id: task.id,
+                            title: task.title,
+                            completed: task.completed || false,
+                            completedPomodoros: task.completedPomodoros || 0,
+                            pomodoroGoal: task.pomodoroGoal || 0,
+                            hasFlowers: task.hasFlowers,
+                            priority: task.priority
+                          } as TaskWithFlowerState}
+                          className="text-xs"
+                        />
                         <Badge 
                           variant="outline" 
                           className={cn(
@@ -330,22 +345,35 @@ export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: T
                       )}
                     </div>
 
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStartPomodoro(task);
-                      }}
-                      disabled={isStarting}
-                      className={cn(
-                        "px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex-shrink-0",
-                        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl",
-                        "disabled:opacity-50 disabled:cursor-not-allowed",
-                        "group-hover:scale-105"
-                      )}
-                    >
-                      <Clock className="w-4 h-4 mr-2" />
-                      {isStarting ? 'Iniciando...' : 'Iniciar Pomodoro'}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <CompleteTaskButton 
+                        task={{
+                          id: task.id,
+                          title: task.title,
+                          completed: task.completed || false,
+                          completedPomodoros: task.completedPomodoros || 0,
+                          pomodoroGoal: task.pomodoroGoal || 0,
+                          hasFlowers: task.hasFlowers,
+                          priority: task.priority
+                        } as TaskWithFlowerState}
+                      />
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStartPomodoro(task);
+                        }}
+                        disabled={isStarting}
+                        className={cn(
+                          "px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex-shrink-0",
+                          "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl",
+                          "disabled:opacity-50 disabled:cursor-not-allowed",
+                          "group-hover:scale-105"
+                        )}
+                      >
+                        <Clock className="w-4 h-4 mr-2" />
+                        {isStarting ? 'Iniciando...' : 'Iniciar Pomodoro'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

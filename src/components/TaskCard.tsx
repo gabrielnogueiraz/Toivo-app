@@ -16,6 +16,9 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useActivePomodoro, useStartPomodoro, useDeleteTask } from '@/hooks';
+import { TaskFlowerIndicator } from './TaskFlowerIndicator';
+import { CompleteTaskButton } from './CompleteTaskButton';
+import { TaskWithFlowerState } from '../types/taskFlower';
 
 interface TaskCardProps {
   task: Task;
@@ -50,6 +53,17 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
     const isTaskActive = activePomodoro?.taskId === task.id;
     const completedPomodoros = task.pomodoros.filter(p => p.status === 'COMPLETED').length;
     const pomodoroProgress = task.pomodoroGoal > 0 ? (completedPomodoros / task.pomodoroGoal) * 100 : 0;
+
+    // Converter task para TaskWithFlowerState
+    const taskWithFlowerState: TaskWithFlowerState = {
+      id: task.id,
+      title: task.title,
+      completed: task.completed || false,
+      completedPomodoros,
+      pomodoroGoal: task.pomodoroGoal || 0,
+      hasFlowers: task.hasFlowers, // Assumindo que essa propriedade será adicionada ao tipo Task
+      priority: task.priority
+    };
 
     const handleStartPomodoro = () => {
       if (!activePomodoro) {
@@ -108,6 +122,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
           <Card className={cn(
             "p-3 md:p-4 border-l-4 hover:shadow-lg transition-all duration-200 touch-target",
             isTaskActive && "ring-2 ring-primary/50 bg-primary/5",
+            taskWithFlowerState.completed && "opacity-60 bg-muted/30",
             task.priority === 'HIGH' && "border-l-red-500",
             task.priority === 'MEDIUM' && "border-l-orange-500",
             task.priority === 'LOW' && "border-l-green-500",
@@ -116,9 +131,13 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
             <div className="flex items-start justify-between gap-2 md:gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-medium text-sm line-clamp-2">
+                  <h3 className={cn(
+                    "font-medium text-sm line-clamp-2 flex-1 transition-all duration-300",
+                    taskWithFlowerState.completed && "line-through text-muted-foreground"
+                  )}>
                     {task.title}
                   </h3>
+                  <TaskFlowerIndicator task={taskWithFlowerState} hideText className="text-xs" />
                   <Badge variant="outline" className={cn(getPriorityBadge(), "text-xs")}>
                     <Flag className="w-3 h-3 mr-1" />
                     {task.priority.toLowerCase()}
@@ -163,16 +182,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
                     exit={{ opacity: 0, x: 10 }}
                     className="flex items-center gap-1"
                   >
-                    {!activePomodoro && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={handleStartPomodoro}
-                        className="h-6 w-6 p-0 touch-target"
-                      >
-                        <Play className="w-3 h-3" />
-                      </Button>
-                    )}
+                    <CompleteTaskButton task={taskWithFlowerState} iconOnly />
                     
                     {isTaskActive && (
                       <motion.div

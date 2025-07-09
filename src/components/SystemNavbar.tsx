@@ -8,7 +8,8 @@ import {
   User, 
   LogOut, 
   Settings,
-  Menu
+  Menu,
+  Flower2
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -57,6 +58,12 @@ export default function SystemNavbar() {
       icon: Trello,
       path: '/boards',
       active: location.pathname === '/boards'
+    },
+    {
+      label: 'Jardim',
+      icon: Flower2,
+      path: '/garden',
+      active: location.pathname === '/garden'
     }
   ];
 
