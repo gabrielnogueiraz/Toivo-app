@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Target, TrendingUp } from 'lucide-react';
+import { Clock, Target, TrendingUp, Timer, Flower } from 'lucide-react';
 import { TaskSelector } from '@/components/TaskSelector';
 import { EnhancedTimerDisplay } from '@/components/EnhancedTimerDisplay';
+import { MagicalFlowerGrowth } from '@/components/MagicalFlowerGrowth';
 import { PomodoroSettingsModal } from '@/components/PomodoroSettingsModal';
 import { useActivePomodoro, useStartPomodoro, usePausePomodoro, useFinishPomodoro } from '@/hooks';
 import { useEffectivePomodoroSettings } from '@/hooks/useEffectivePomodoroSettings';
@@ -24,6 +25,7 @@ export default function PomodoroPage() {
   const [mode, setMode] = useState<'work' | 'shortBreak' | 'longBreak'>('work');
   const [sessionCount, setSessionCount] = useState(1);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'timer' | 'flower'>('timer');
 
   const [todayStats, setTodayStats] = useState({
     completedPomodoros: 0,
@@ -157,7 +159,28 @@ export default function PomodoroPage() {
     }
   };
 
-  // Timer effect
+  // Calcular progresso da flor baseado no timer
+  const getFlowerProgress = () => {
+    if (totalTime === 0) return 0;
+    return ((totalTime - timeLeft) / totalTime) * 100;
+  };
+
+  // Determinar tipo de flor baseado no modo e duração
+  const getFlowerType = (): 'common' | 'rare' | 'legendary' => {
+    if (mode === 'longBreak') return 'legendary';
+    if (mode === 'work' && totalTime >= 45 * 60) return 'rare'; // 45+ minutos
+    return 'common';
+  };
+
+  // Obter prioridade da tarefa ativa
+  const getTaskPriority = (): 'LOW' | 'MEDIUM' | 'HIGH' => {
+    if (activePomodoro?.task?.priority) {
+      return activePomodoro.task.priority;
+    }
+    return 'MEDIUM'; // Default para quando não há tarefa ativa
+  };
+
+  // Timer effect com integração de completion automática
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
@@ -165,13 +188,14 @@ export default function PomodoroPage() {
       interval = setInterval(() => {
         setTimeLeft(prev => prev - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && activePomodoro) {
+      // Timer chegou ao fim - finalizar pomodoro automaticamente
       setIsRunning(false);
-      // Handle timer completion
+      finishPomodoro(activePomodoro.id);
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft]);
+  }, [isRunning, timeLeft, activePomodoro, finishPomodoro]);
 
   return (
     <div className="h-full">
@@ -239,18 +263,82 @@ export default function PomodoroPage() {
                     </motion.div>
                   )}
 
-                  {/* Enhanced Timer Display */}
+                  {/* View Mode Toggle */}
+                  <div className="flex justify-center mb-6">
+                    <div className="inline-flex items-center bg-muted p-1 rounded-full">
+                      <Button
+                        variant={viewMode === 'timer' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setViewMode('timer')}
+                        className={cn(
+                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                          viewMode === 'timer' 
+                            ? "bg-primary text-primary-foreground shadow-lg" 
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <Timer className="w-4 h-4 mr-2" />
+                        Timer
+                      </Button>
+                      <Button
+                        variant={viewMode === 'flower' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setViewMode('flower')}
+                        className={cn(
+                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                          viewMode === 'flower' 
+                            ? "bg-emerald-500 text-white shadow-lg" 
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <Flower className="w-4 h-4 mr-2" />
+                        Flor Mágica
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Enhanced Timer Display or Magical Flower Growth */}
                   <div className="flex justify-center mb-8">
-                    <EnhancedTimerDisplay
-                      timeLeft={timeLeft}
-                      totalTime={totalTime}
-                      isRunning={isRunning}
-                      mode={mode}
-                      onStart={handleStart}
-                      onPause={handlePause}
-                      onReset={handleReset}
-                      onOpenSettings={() => setIsSettingsOpen(true)}
-                    />
+                    {viewMode === 'timer' ? (
+                      <EnhancedTimerDisplay
+                        timeLeft={timeLeft}
+                        totalTime={totalTime}
+                        isRunning={isRunning}
+                        mode={mode}
+                        onStart={handleStart}
+                        onPause={handlePause}
+                        onReset={handleReset}
+                        onOpenSettings={() => setIsSettingsOpen(true)}
+                      />
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className="w-full max-w-md"
+                      >
+                        <MagicalFlowerGrowth
+                          progress={getFlowerProgress()}
+                          isActive={isRunning}
+                          priority={getTaskPriority()}
+                          onStart={handleStart}
+                          onPause={handlePause}
+                          onReset={handleReset}
+                          onOpenSettings={() => setIsSettingsOpen(true)}
+                          isRunning={isRunning}
+                        />
+                        
+                        {!activePomodoro && mode === 'work' && (
+                          <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-center text-sm text-muted-foreground mt-4"
+                          >
+                            Selecione uma tarefa abaixo para começar a cultivar sua flor! 🌱
+                          </motion.p>
+                        )}
+                      </motion.div>
+                    )}
                   </div>
 
                   {/* Mode Selector - Clean Design */}

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { BarChart3, Timer, TrendingUp, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RecentFlowersWidget } from '@/components/RecentFlowersWidget';
 
 export default function Dashboard() {
   return (
@@ -102,21 +103,56 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
+      {/* Grid com widgets adicionais */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 md:mb-8">
+        {/* Widget de Flores Recentes */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <RecentFlowersWidget />
+        </motion.div>
+
+        {/* Placeholder para outros widgets */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                📊 Relatórios
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-6">
+                <div className="text-4xl mb-2">📈</div>
+                <p className="text-gray-600 mb-4">
+                  Relatórios detalhados em breve
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="flex items-center justify-center h-48 md:h-64"
+        transition={{ delay: 0.7 }}
+        className="flex items-center justify-center h-32 md:h-48"
       >
         <div className="text-center px-4">
           <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-primary" />
           </div>
           <h3 className="text-base md:text-lg font-semibold mb-2">
-            Dashboard em Desenvolvimento
+            Mais recursos em breve
           </h3>
           <p className="text-muted-foreground max-w-md text-sm md:text-base">
-            Em breve você terá acesso a relatórios detalhados, gráficos de produtividade e muito mais.
+            Estamos preparando gráficos avançados, análises de tempo e insights de produtividade.
           </p>
         </div>
       </motion.div>
