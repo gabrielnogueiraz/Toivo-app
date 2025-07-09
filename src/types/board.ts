@@ -12,6 +12,8 @@ export interface Task {
   columnId: string;
   order: number;
   pomodoros: Pomodoro[];
+  completed?: boolean;
+  hasFlowers?: boolean;
   createdAt: string;
   updatedAt: string;
 }
