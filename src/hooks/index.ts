@@ -15,3 +15,5 @@ export * from './useUser';
 export * from './useDebounce';
 export * from './use-mobile';
 export * from './use-toast';
+export * from './useTaskCompletion';
+export { default as useGardenRealtime } from './useGardenRealtime';
