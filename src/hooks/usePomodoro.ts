@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { pomodoroService } from '@/services';
 import { Pomodoro, StartPomodoroRequest } from '@/types/board';
+import { useTaskCompletion } from './useTaskCompletion';
 
 export const POMODOROS_QUERY_KEY = ['pomodoros'] as const;
 export const ACTIVE_POMODORO_QUERY_KEY = ['pomodoro', 'active'] as const;
@@ -73,9 +74,14 @@ export const useResumePomodoro = () => {
 
 export const useFinishPomodoro = () => {
   const queryClient = useQueryClient();
+  const { finishPomodoro } = useTaskCompletion();
 
   return useMutation({
-    mutationFn: (id: string) => pomodoroService.finishPomodoro(id),
+    mutationFn: async (id: string) => {
+      // Usar o método do useTaskCompletion que já trata completion de tarefas
+      const response = await finishPomodoro(id);
+      return response.data.pomodoro;
+    },
     onSuccess: (completedPomodoro) => {
       queryClient.setQueryData<Pomodoro | null>(ACTIVE_POMODORO_QUERY_KEY, null);
       queryClient.setQueryData(['pomodoro', completedPomodoro.id], completedPomodoro);
