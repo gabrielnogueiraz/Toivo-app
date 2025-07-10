@@ -9,7 +9,8 @@ import {
   LogOut, 
   Settings,
   Menu,
-  Flower2
+  Flower2,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -64,6 +65,12 @@ export default function SystemNavbar() {
       icon: Flower2,
       path: '/garden',
       active: location.pathname === '/garden'
+    },
+    {
+      label: 'Lumi',
+      icon: Sparkles,
+      path: '/lumi',
+      active: location.pathname === '/lumi'
     }
   ];
 
