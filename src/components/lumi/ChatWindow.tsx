@@ -71,11 +71,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
       {/* Header */}
       <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-background/80 backdrop-blur-sm">
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center shadow-sm">
             <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
           <div>
             <h1 className="text-base sm:text-lg font-semibold">Lumi</h1>
+            <p className="text-xs text-muted-foreground hidden sm:block">Sua assistente de produtividade</p>
           </div>
         </div>
 
@@ -110,7 +111,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
           /* Welcome Screen with Floating Input */
           <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
             {/* Avatar */}
-            <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-6 sm:mb-8 shadow-lg">
+            <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center mb-6 sm:mb-8 shadow-lg">
               <Sparkles className="h-8 sm:h-10 w-8 sm:w-10 text-white" />
             </div>
             
@@ -174,8 +175,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
         ) : (
           /* Chat Messages */
           <>
-            <ScrollArea ref={scrollAreaRef} className="flex-1 p-3 sm:p-4">
-              <div className="space-y-2 max-w-4xl mx-auto">
+            <ScrollArea ref={scrollAreaRef} className="flex-1 p-4 sm:p-6">
+              <div className="space-y-0 max-w-4xl mx-auto">
                 {messages.map((message) => (
                   <MessageBubble
                     key={message.id}
@@ -185,7 +186,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
                 
                 {/* Error Message */}
                 {error && (
-                  <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm mx-4 sm:mx-0">
+                  <div className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
                     <AlertCircle className="h-4 w-4 flex-shrink-0" />
                     <span className="flex-1 min-w-0">{error}</span>
                     <Button
