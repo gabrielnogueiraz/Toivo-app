@@ -562,3 +562,56 @@ All colors MUST be HSL.
 .lumi-avatar.assistant {
   @apply lumi-gradient text-white;
 }
+
+/* Estilos personalizados para o chat da Lumi */
+@layer components {
+  .lumi-message {
+    @apply prose prose-sm max-w-none dark:prose-invert;
+    @apply prose-headings:text-foreground prose-headings:font-semibold;
+    @apply prose-p:text-foreground prose-p:leading-relaxed;
+    @apply prose-strong:text-foreground prose-strong:font-semibold;
+    @apply prose-ul:text-foreground prose-ol:text-foreground;
+    @apply prose-li:text-foreground;
+    @apply prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:rounded;
+  }
+  
+  .lumi-message h1,
+  .lumi-message h2,
+  .lumi-message h3 {
+    @apply first:mt-0 last:mb-0;
+  }
+  
+  .lumi-message p {
+    @apply first:mt-0 last:mb-0;
+  }
+  
+  .lumi-message ul,
+  .lumi-message ol {
+    @apply first:mt-0 last:mb-0;
+  }
+  
+  .lumi-message ul li::marker {
+    @apply text-primary;
+  }
+  
+  .lumi-message ol li::marker {
+    @apply text-primary font-semibold;
+  }
+  
+  /* Estilos para diferentes tipos de conteúdo */
+  .lumi-priority-high {
+    @apply text-red-600 dark:text-red-400 font-medium;
+  }
+  
+  .lumi-priority-medium {
+    @apply text-amber-600 dark:text-amber-400 font-medium;
+  }
+  
+  .lumi-priority-low {
+    @apply text-green-600 dark:text-green-400 font-medium;
+  }
+  
+  .lumi-stat-highlight {
+    @apply bg-primary/10 text-primary px-2 py-1 rounded-md font-medium;
+  }
+}
