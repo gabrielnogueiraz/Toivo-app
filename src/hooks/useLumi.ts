@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { createLumiService, LumiService } from '@/services/lumi';
-import { createLumiServiceWithFallback } from '@/services/lumi/mockLumiService';
 import { getAuthToken } from '@/services/api';
 import { LumiMessage, LumiContext } from '@/types/lumi';
 
@@ -43,8 +42,8 @@ export const useLumi = (options: UseLumiOptions = {}): UseLumiReturn => {
     const token = getAuthToken();
     
     if (token) {
-      // Usuário autenticado - usar serviço real ou mock conforme configuração
-      lumiServiceRef.current = createLumiServiceWithFallback();
+      // Usuário autenticado - usar serviço REAL da Lumi (sem mock)
+      lumiServiceRef.current = createLumiService();
       checkConnection();
     } else {
       // Usuário não autenticado
@@ -53,16 +52,18 @@ export const useLumi = (options: UseLumiOptions = {}): UseLumiReturn => {
     }
   }, [user?.id]); // Monitora mudanças no usuário
 
-  // Verificar conexão com a API
+  // Verificar conexão com a API (tolerante a erros)
   const checkConnection = useCallback(async () => {
     if (!lumiServiceRef.current) return;
 
     try {
-      const isHealthy = await lumiServiceRef.current.checkHealth();
-      setIsConnected(isHealthy);
+      const isReady = await lumiServiceRef.current.isLumiReady();
+      setIsConnected(isReady);
+      setError(null); // Limpar erro se conexão for bem-sucedida
     } catch (error) {
       setIsConnected(false);
-      console.error('Erro ao verificar conexão com a Lumi:', error);
+      // Não definir como erro crítico se a API simplesmente não estiver disponível
+      console.warn('Lumi não está pronta:', error);
     }
   }, []);
 
