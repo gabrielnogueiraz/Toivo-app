@@ -116,10 +116,6 @@ export class MockLumiService {
     return null;
   }
 
-  async checkHealth(): Promise<boolean> {
-    return this.isAuthenticated();
-  }
-
   async validateToken(): Promise<boolean> {
     return this.isAuthenticated();
   }
@@ -167,23 +163,19 @@ export class MockLumiService {
 }
 
 /**
- * Verifica se deve usar o serviço mock
+ * Verifica se deve usar o serviço mock (DESABILITADO para testes reais)
  */
 export const shouldUseMockService = (): boolean => {
-  return process.env.NODE_ENV === 'development' && 
-         !import.meta.env.VITE_LUMI_API_URL;
+  // SEMPRE retorna false para forçar uso da API real
+  return false;
 };
 
 /**
- * Factory para criar serviço da Lumi (real ou mock)
- * Agora não precisa mais do userId
+ * Factory para criar serviço da Lumi (SEMPRE usa serviço real)
+ * Mock desabilitado para testes com a Lumi real
  */
 export const createLumiServiceWithFallback = () => {
-  if (shouldUseMockService()) {
-    return new MockLumiService();
-  }
-  
-  // Se não for mock, importar o serviço real
+  // SEMPRE usa o serviço real da Lumi
   const { createLumiService } = require('@/services/lumi');
   return createLumiService();
 };

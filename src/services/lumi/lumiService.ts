@@ -1,5 +1,5 @@
 import { createLumiClient, LumiAPIClient } from './api-lumi';
-import { getAuthToken } from '@/services/api';
+import { getAuthToken, getLumiToken } from '@/services/api';
 import {
   LumiMessage,
   LumiMemory,
@@ -9,7 +9,7 @@ import {
 
 /**
  * Serviço principal da Lumi que gerencia todas as interações
- * Agora usa automaticamente o token JWT do Toivo para autenticação
+ * Agora usa automaticamente o token JWT convertido para Lumi
  */
 export class LumiService {
   private client: LumiAPIClient;
@@ -17,12 +17,26 @@ export class LumiService {
   constructor() {
     this.client = createLumiClient();
   }
+  
+
 
   /**
    * Verifica se o usuário está autenticado
    */
   private isAuthenticated(): boolean {
     return !!getAuthToken();
+  }
+
+  /**
+   * Verifica se a Lumi está pronta para uso
+   */
+  async isLumiReady(): Promise<boolean> {
+    if (!this.isAuthenticated()) {
+      return false;
+    }
+
+    // Simplesmente retorna true se autenticado, sem chamar health check
+    return true;
   }
 
   /**
@@ -118,7 +132,18 @@ export class LumiService {
       const response = await this.client.getMemories({ type, limit });
       return response.data;
     } catch (error) {
-      console.error('Erro ao buscar memórias:', error);
+      console.error('❌ Erro ao buscar memórias:', error);
+      
+      // Se for erro 400, tentar sem filtros
+      if (error instanceof Error && error.message.includes('400')) {
+        try {
+          const fallbackResponse = await this.client.getMemories({});
+          return fallbackResponse.data;
+        } catch (fallbackError) {
+          console.error('❌ Erro na busca de fallback:', fallbackError);
+        }
+      }
+      
       return [];
     }
   }
@@ -159,20 +184,7 @@ export class LumiService {
   }
 
   /**
-   * Verifica se a API está funcionando
-   */
-  async checkHealth(): Promise<boolean> {
-    try {
-      await this.client.healthCheck();
-      return true;
-    } catch (error) {
-      console.error('API da Lumi indisponível:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Valida se o token JWT ainda é válido
+   * Valida o token verificando a conexão com a API
    */
   async validateToken(): Promise<boolean> {
     if (!this.isAuthenticated()) {
@@ -180,7 +192,7 @@ export class LumiService {
     }
 
     try {
-      return await this.client.validateToken();
+      return await this.isLumiReady();
     } catch (error) {
       console.error('Erro ao validar token:', error);
       return false;

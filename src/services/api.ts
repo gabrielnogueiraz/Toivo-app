@@ -1,6 +1,12 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 const TOKEN_KEY = 'toivo_access_token';
+const LUMI_TOKEN_KEY = 'lumi_token';
+const LUMI_TOKEN_EXPIRY_KEY = 'lumi_token_expiry';
+
+// Cache do token Lumi em memória para melhor performance
+let lumiTokenCache: string | null = null;
+let lumiTokenExpiryCache: Date | null = null;
 
 /**
  * Define o token de autenticação para as requisições da API.
@@ -42,6 +48,112 @@ export const getUserData = () => {
 export const clearAuthData = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem('toivo_user');
+  localStorage.removeItem(LUMI_TOKEN_KEY);
+  localStorage.removeItem(LUMI_TOKEN_EXPIRY_KEY);
+  
+  // Limpar cache em memória
+  lumiTokenCache = null;
+  lumiTokenExpiryCache = null;
+};
+
+/**
+ * Obtém token compatível com a Lumi
+ * Implementa cache automático para evitar conversões desnecessárias
+ */
+export const getLumiToken = async (): Promise<string | null> => {
+  try {
+    // Verifica se tem token cached e ainda válido
+    if (lumiTokenCache && lumiTokenExpiryCache && new Date() < lumiTokenExpiryCache) {
+      console.log('🔄 Usando token Lumi em cache');
+      return lumiTokenCache;
+    }
+
+    // Verifica localStorage como fallback
+    const cachedToken = localStorage.getItem(LUMI_TOKEN_KEY);
+    const cachedExpiry = localStorage.getItem(LUMI_TOKEN_EXPIRY_KEY);
+    
+    if (cachedToken && cachedExpiry && new Date() < new Date(cachedExpiry)) {
+      lumiTokenCache = cachedToken;
+      lumiTokenExpiryCache = new Date(cachedExpiry);
+      console.log('🔄 Usando token Lumi do localStorage');
+      return cachedToken;
+    }
+
+    // Obtém novo token do Toivo
+    console.log('🔄 Solicitando novo token Lumi...');
+    await refreshLumiToken();
+    return lumiTokenCache;
+
+  } catch (error) {
+    console.error('❌ Erro ao obter token Lumi:', error);
+    return null;
+  }
+};
+
+/**
+ * Solicita novo token compatível com Lumi do backend Toivo
+ */
+const refreshLumiToken = async (): Promise<void> => {
+  try {
+    const toivoToken = getAuthToken(); // Token original do Toivo
+    
+    if (!toivoToken) {
+      throw new Error('Usuário não está logado no Toivo');
+    }
+
+    console.log('🔄 Convertendo token Toivo para Lumi...');
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'}/auth/lumi-token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${toivoToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({}) // Corpo vazio conforme implementação do Toivo
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Erro ${response.status}: ${errorData.message || 'Falha na conversão de token'}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success && data.token) {
+      lumiTokenCache = data.token;
+      
+      // Define expiração com margem de segurança (5 min antes do real)
+      const expiryMargin = 5 * 60 * 1000; // 5 minutos em millisegundos
+      lumiTokenExpiryCache = new Date(Date.now() + (data.expiresIn * 1000) - expiryMargin);
+      
+      // Persistir no localStorage como backup
+      localStorage.setItem(LUMI_TOKEN_KEY, data.token);
+      localStorage.setItem(LUMI_TOKEN_EXPIRY_KEY, lumiTokenExpiryCache.toISOString());
+      
+      console.log('✅ Token Lumi obtido com sucesso');
+      console.log(`   Expira em: ${lumiTokenExpiryCache.toLocaleTimeString()}`);
+    } else {
+      throw new Error('Resposta inválida do servidor Toivo');
+    }
+
+  } catch (error: any) {
+    console.error('❌ Erro ao converter token:', error.message);
+    lumiTokenCache = null;
+    lumiTokenExpiryCache = null;
+    throw error;
+  }
+};
+
+/**
+ * Verifica se precisa renovar token Lumi
+ */
+export const isLumiTokenExpiring = (): boolean => {
+  if (!lumiTokenExpiryCache) return true;
+  
+  // Considera expirando se restam menos de 2 minutos
+  const now = new Date();
+  const timeLeft = lumiTokenExpiryCache.getTime() - now.getTime();
+  return timeLeft < (2 * 60 * 1000); // 2 minutos
 };
 
 const apiClient: AxiosInstance = axios.create({
