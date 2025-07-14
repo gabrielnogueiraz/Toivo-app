@@ -36,20 +36,21 @@ export const LumiSidebar: React.FC<LumiSidebarProps> = ({ className }) => {
   const [activeTab, setActiveTab] = useState<'context' | 'memories' | 'insights'>('context');
 
   const MemoryCard: React.FC<{ memory: LumiMemory }> = ({ memory }) => (
-    <Card className="mb-3">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+    <Card className="mb-2 sm:mb-3">
+      <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
+        <div className="flex items-center justify-between gap-1 sm:gap-2">
           <Badge variant="outline" className="text-xs">
             {memory.type.replace('_', ' ')}
           </Badge>
           <Badge variant={memory.importance === 'HIGH' ? 'destructive' : 
-                           memory.importance === 'MEDIUM' ? 'default' : 'secondary'}>
+                           memory.importance === 'MEDIUM' ? 'default' : 'secondary'}
+                 className="text-xs">
             {memory.importance}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
-        <p className="text-sm text-muted-foreground line-clamp-3">
+      <CardContent className="pt-0 p-3 sm:p-6">
+        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3">
           {memory.content}
         </p>
         {memory.tags.length > 0 && (
@@ -72,13 +73,13 @@ export const LumiSidebar: React.FC<LumiSidebarProps> = ({ className }) => {
 
   return (
     <div className={cn(
-      'w-80 border-l bg-muted/30 flex flex-col',
+      'w-full sm:w-80 border-l bg-muted/30 flex flex-col',
       className
     )}>
       {/* Header */}
-      <div className="p-4 border-b">
+      <div className="p-3 sm:p-4 border-b">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Contexto</h2>
+          <h2 className="text-base sm:text-lg font-semibold">Contexto</h2>
           <Button
             variant="ghost"
             size="sm"
@@ -88,8 +89,9 @@ export const LumiSidebar: React.FC<LumiSidebarProps> = ({ className }) => {
               refreshInsights();
             }}
             disabled={loading}
+            className="h-8 w-8 sm:h-9 sm:w-9"
           >
-            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
+            <RefreshCw className={cn('h-3.5 w-3.5 sm:h-4 sm:w-4', loading && 'animate-spin')} />
           </Button>
         </div>
       </div>
@@ -97,69 +99,73 @@ export const LumiSidebar: React.FC<LumiSidebarProps> = ({ className }) => {
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-4">
-            <TabsTrigger value="context">
-              <User className="h-4 w-4 mr-1" />
-              Perfil
+          <TabsList className="grid w-full grid-cols-3 mx-3 sm:mx-4 mt-3 sm:mt-4">
+            <TabsTrigger value="context" className="text-xs sm:text-sm">
+              <User className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">Perfil</span>
+              <span className="sm:hidden">P</span>
             </TabsTrigger>
-            <TabsTrigger value="memories">
-              <Brain className="h-4 w-4 mr-1" />
-              Memórias
+            <TabsTrigger value="memories" className="text-xs sm:text-sm">
+              <Brain className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">Memórias</span>
+              <span className="sm:hidden">M</span>
             </TabsTrigger>
-            <TabsTrigger value="insights">
-              <Lightbulb className="h-4 w-4 mr-1" />
-              Insights
+            <TabsTrigger value="insights" className="text-xs sm:text-sm">
+              <Lightbulb className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+              <span className="hidden sm:inline">Insights</span>
+              <span className="sm:hidden">I</span>
             </TabsTrigger>
           </TabsList>
 
-          <div className="p-4 pt-2">
+          <div className="p-3 sm:p-4 pt-2">{/* ...existing code... */}
             {/* User Context */}
-            <TabsContent value="context" className="mt-4">
-              <ScrollArea className="h-[calc(100vh-16rem)]">
-                {userContext ? (
-                  <div className="space-y-4">
+            <TabsContent value="context" className="mt-3 sm:mt-4">
+              <ScrollArea className="h-[calc(100vh-14rem)] sm:h-[calc(100vh-16rem)]">
+                {userContext && userContext.user ? (
+                  <div className="space-y-3 sm:space-y-4">
                     {/* User Info */}
                     <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">
-                          {userContext.user.name}
+                      <CardHeader className="p-3 sm:p-6">
+                        <CardTitle className="text-sm sm:text-base">
+                          {userContext.user.name || 'Usuário sem nome'}
                         </CardTitle>
-                        <CardDescription>
-                          ID: {userContext.user.id}
+                        <CardDescription className="text-xs sm:text-sm">
+                          ID: {userContext.user.id || 'ID não disponível'}
                         </CardDescription>
                       </CardHeader>
                     </Card>
 
                     {/* Recent Activity */}
                     <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Atividade Recente
+                      <CardHeader className="p-3 sm:p-6">
+                        <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">Atividade Recente</span>
+                          <span className="sm:hidden">Atividade</span>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        {userContext.recentActivity.length > 0 ? (
-                          <div className="space-y-3">
+                      <CardContent className="p-3 sm:p-6 pt-0">
+                        {userContext.recentActivity && userContext.recentActivity.length > 0 ? (
+                          <div className="space-y-2 sm:space-y-3">
                             {userContext.recentActivity.slice(0, 5).map((activity, index) => (
                               <div key={index} className="flex items-start gap-2">
-                                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mt-1.5 sm:mt-2 flex-shrink-0"></div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium">
-                                    {activity.type}
+                                  <p className="text-xs sm:text-sm font-medium line-clamp-2">
+                                    {activity.type || 'Tipo não especificado'}
                                   </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {activity.description}
+                                  <p className="text-xs text-muted-foreground line-clamp-2">
+                                    {activity.description || 'Sem descrição'}
                                   </p>
                                   <p className="text-xs text-muted-foreground mt-1">
-                                    {new Date(activity.timestamp).toLocaleString('pt-BR')}
+                                    {activity.timestamp ? new Date(activity.timestamp).toLocaleString('pt-BR') : 'Data não disponível'}
                                   </p>
                                 </div>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs sm:text-sm text-muted-foreground">
                             Nenhuma atividade recente
                           </p>
                         )}
@@ -168,32 +174,33 @@ export const LumiSidebar: React.FC<LumiSidebarProps> = ({ className }) => {
 
                     {/* Current Tasks */}
                     <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4" />
-                          Tarefas Atuais
+                      <CardHeader className="p-3 sm:p-6">
+                        <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                          <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">Tarefas Atuais</span>
+                          <span className="sm:hidden">Tarefas</span>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        {userContext.currentTasks.length > 0 ? (
-                          <div className="space-y-2">
+                      <CardContent className="p-3 sm:p-6 pt-0">
+                        {userContext.currentTasks && userContext.currentTasks.length > 0 ? (
+                          <div className="space-y-1.5 sm:space-y-2">
                             {userContext.currentTasks.slice(0, 5).map((task, index) => (
                               <div key={index} className="flex items-center gap-2">
                                 <div className={cn(
-                                  'w-2 h-2 rounded-full',
+                                  'w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full',
                                   task.completed ? 'bg-green-500' : 'bg-yellow-500'
                                 )}></div>
-                                <span className="text-sm flex-1 line-clamp-1">
-                                  {task.title}
+                                <span className="text-xs sm:text-sm flex-1 line-clamp-1">
+                                  {task.title || 'Tarefa sem título'}
                                 </span>
                                 <Badge variant="outline" className="text-xs">
-                                  {task.priority}
+                                  {task.priority || 'Sem prioridade'}
                                 </Badge>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs sm:text-sm text-muted-foreground">
                             Nenhuma tarefa atual
                           </p>
                         )}
@@ -202,7 +209,7 @@ export const LumiSidebar: React.FC<LumiSidebarProps> = ({ className }) => {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-32">
-                    <p className="text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Carregando contexto...
                     </p>
                   </div>
@@ -211,18 +218,18 @@ export const LumiSidebar: React.FC<LumiSidebarProps> = ({ className }) => {
             </TabsContent>
 
             {/* Memories */}
-            <TabsContent value="memories" className="mt-4">
-              <ScrollArea className="h-[calc(100vh-16rem)]">
+            <TabsContent value="memories" className="mt-3 sm:mt-4">
+              <ScrollArea className="h-[calc(100vh-14rem)] sm:h-[calc(100vh-16rem)]">
                 {memories.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {memories.map((memory) => (
                       <MemoryCard key={memory.id} memory={memory} />
                     ))}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-32 text-center">
-                    <Archive className="h-8 w-8 text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">
+                    <Archive className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground mb-2" />
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Nenhuma memória encontrada
                     </p>
                   </div>
@@ -231,18 +238,18 @@ export const LumiSidebar: React.FC<LumiSidebarProps> = ({ className }) => {
             </TabsContent>
 
             {/* Insights */}
-            <TabsContent value="insights" className="mt-4">
-              <ScrollArea className="h-[calc(100vh-16rem)]">
+            <TabsContent value="insights" className="mt-3 sm:mt-4">
+              <ScrollArea className="h-[calc(100vh-14rem)] sm:h-[calc(100vh-16rem)]">
                 {insights.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {insights.map((insight) => (
                       <MemoryCard key={insight.id} memory={insight} />
                     ))}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-32 text-center">
-                    <Lightbulb className="h-8 w-8 text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">
+                    <Lightbulb className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground mb-2" />
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Nenhum insight disponível
                     </p>
                   </div>

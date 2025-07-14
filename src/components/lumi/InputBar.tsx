@@ -68,10 +68,10 @@ export const InputBar: React.FC<InputBarProps> = ({
 
   return (
     <div className={cn(
-      'border-t bg-background/80 backdrop-blur-sm',
+      'bg-background/80 backdrop-blur-sm',
       className
     )}>
-      <form onSubmit={handleSubmit} className="p-4">
+      <form onSubmit={handleSubmit} className="p-3 sm:p-4">
         <div className={cn(
           'flex items-end gap-2 transition-all duration-200',
           isExpanded ? 'flex-col' : 'flex-row'
@@ -96,11 +96,11 @@ export const InputBar: React.FC<InputBarProps> = ({
               placeholder={!isConnected ? 'Conectando...' : placeholder}
               disabled={!isConnected}
               className={cn(
-                'min-h-[44px] max-h-32 resize-none border-2 transition-all duration-200',
+                'min-h-[40px] sm:min-h-[44px] max-h-32 resize-none border-2 transition-all duration-200',
                 'focus:border-primary focus:ring-2 focus:ring-primary/20',
-                'placeholder:text-muted-foreground/60',
+                'placeholder:text-muted-foreground/60 text-sm sm:text-base',
                 !isConnected && 'bg-muted/50 cursor-not-allowed',
-                isExpanded && 'min-h-[80px]'
+                isExpanded && 'min-h-[60px] sm:min-h-[80px]'
               )}
               rows={1}
             />
@@ -115,29 +115,29 @@ export const InputBar: React.FC<InputBarProps> = ({
 
           {/* Action buttons */}
           <div className={cn(
-            'flex items-center gap-2',
+            'flex items-center gap-1 sm:gap-2',
             isExpanded ? 'w-full justify-between' : 'flex-shrink-0'
           )}>
             {/* Secondary actions (only in expanded mode) */}
             {isExpanded && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   disabled={!isConnected}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                 >
-                  <Paperclip className="h-4 w-4" />
+                  <Paperclip className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   disabled={!isConnected}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                 >
-                  <Mic className="h-4 w-4" />
+                  <Mic className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             )}
@@ -149,16 +149,18 @@ export const InputBar: React.FC<InputBarProps> = ({
               size={isExpanded ? 'sm' : 'default'}
               className={cn(
                 'transition-all duration-200',
-                isExpanded ? 'h-8 px-3' : 'h-11 w-11 p-0'
+                isExpanded 
+                  ? 'h-7 px-3 sm:h-8 sm:px-3 text-xs sm:text-sm' 
+                  : 'h-9 w-9 sm:h-11 sm:w-11 p-0'
               )}
             >
               {isLoading ? (
-                <Square className="h-4 w-4" />
+                <Square className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               ) : (
-                <Send className="h-4 w-4" />
+                <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               )}
               {isExpanded && !isLoading && (
-                <span className="ml-2">Enviar</span>
+                <span className="ml-1 sm:ml-2">Enviar</span>
               )}
             </Button>
           </div>
@@ -166,7 +168,7 @@ export const InputBar: React.FC<InputBarProps> = ({
 
         {/* Connection status */}
         {!isConnected && (
-          <div className="mt-2 text-sm text-destructive flex items-center gap-2">
+          <div className="mt-2 text-xs sm:text-sm text-destructive flex items-center gap-2">
             <div className="w-2 h-2 bg-destructive rounded-full animate-pulse"></div>
             Reconectando...
           </div>
