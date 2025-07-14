@@ -1,12 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { createLumiService, LumiService } from '@/services/lumi';
-import { createLumiServiceWithFallback } from '@/services/lumi/mockLumiService';
 import { getAuthToken } from '@/services/api';
 import { LumiMemory, LumiContextResponse } from '@/types/lumi';
 
 interface LumiContextType {
-  lumiService: LumiService | any;
+  lumiService: LumiService | null;
   isConnected: boolean;
   userContext: LumiContextResponse | null;
   memories: LumiMemory[];
@@ -28,7 +27,7 @@ export const LumiProvider: React.FC<LumiProviderProps> = ({ children }) => {
   const { user } = useAuth();
   
   // Estados
-  const [lumiService, setLumiService] = useState<LumiService | any>(null);
+  const [lumiService, setLumiService] = useState<LumiService | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [userContext, setUserContext] = useState<LumiContextResponse | null>(null);
   const [memories, setMemories] = useState<LumiMemory[]>([]);
@@ -38,105 +37,119 @@ export const LumiProvider: React.FC<LumiProviderProps> = ({ children }) => {
 
   // Inicializar serviço da Lumi
   useEffect(() => {
-    // Verifica se há token de autenticação disponível
     const token = getAuthToken();
     
-    if (token) {
-      // Usuário autenticado - usar serviço real ou mock conforme configuração
-      const service = createLumiServiceWithFallback();
+    if (token && user) {
+      console.log('🚀 Inicializando serviço da Lumi para usuário:', user.name);
+      const service = createLumiService();
       setLumiService(service);
       checkConnection(service);
     } else {
-      // Usuário não autenticado
+      console.log('👤 Usuário não autenticado - serviço Lumi não iniciado');
       setLumiService(null);
       setIsConnected(false);
     }
-  }, [user?.id]); // Monitora mudanças no usuário
+  }, [user]);
 
-  // Verificar conexão
-  const checkConnection = async (service: LumiService | any) => {
+  // Verificar conexão com a API da Lumi
+  const checkConnection = async (service: LumiService) => {
     try {
-      const isHealthy = await service.checkHealth();
-      setIsConnected(isHealthy);
+      console.log('🔗 Verificando conexão com Lumi...');
+      setLoading(true);
+      setError(null);
       
-      if (isHealthy) {
-        // Carregar dados iniciais
+      const isReady = await service.isLumiReady();
+      setIsConnected(isReady);
+      
+      if (isReady) {
+        console.log('✅ Conexão com Lumi estabelecida');
         await loadInitialData(service);
+      } else {
+        console.warn('⚠️ Lumi não está pronta');
       }
     } catch (error) {
+      console.error('❌ Erro ao conectar com Lumi:', error);
       setIsConnected(false);
-      setError('Não foi possível conectar com a Lumi');
-      console.error('Erro ao verificar conexão:', error);
-    }
-  };
-
-  // Carregar dados iniciais
-  const loadInitialData = async (service: LumiService | any) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const [contextData, memoriesData, insightsData] = await Promise.allSettled([
-        service.getUserContext(),
-        service.getUserMemories(undefined, 20),
-        service.getProductivityInsights(),
-      ]);
-
-      // Processar contexto
-      if (contextData.status === 'fulfilled' && contextData.value) {
-        setUserContext(contextData.value);
-      }
-
-      // Processar memórias
-      if (memoriesData.status === 'fulfilled') {
-        setMemories(memoriesData.value);
-      }
-
-      // Processar insights
-      if (insightsData.status === 'fulfilled') {
-        setInsights(insightsData.value);
-      }
-    } catch (error) {
-      setError('Erro ao carregar dados da Lumi');
-      console.error('Erro ao carregar dados iniciais:', error);
+      setError(error instanceof Error ? error.message : 'Erro desconhecido');
     } finally {
       setLoading(false);
     }
   };
 
-  // Atualizar contexto do usuário
+  // Carregar dados iniciais (mais tolerante a erros)
+  const loadInitialData = async (service: LumiService) => {
+    try {
+      console.log('📥 Carregando dados iniciais...');
+      
+      // Tentar carregar contexto (não crítico)
+      try {
+        const context = await service.getUserContext();
+        setUserContext(context);
+        console.log('✅ Contexto do usuário carregado');
+      } catch (error) {
+        console.warn('⚠️ Falha ao carregar contexto:', error);
+      }
+
+      // Tentar carregar memórias (não crítico, com menos itens)
+      try {
+        const userMemories = await service.getUserMemories(undefined, 5);
+        setMemories(userMemories);
+        console.log('✅ Memórias carregadas:', userMemories.length);
+      } catch (error) {
+        console.warn('⚠️ Falha ao carregar memórias:', error);
+        setMemories([]);
+      }
+
+      // Tentar carregar insights (não crítico)
+      try {
+        const productivityInsights = await service.getProductivityInsights();
+        setInsights(productivityInsights);
+        console.log('✅ Insights carregados:', productivityInsights.length);
+      } catch (error) {
+        console.warn('⚠️ Falha ao carregar insights:', error);
+        setInsights([]);
+      }
+
+    } catch (error) {
+      console.error('❌ Erro no carregamento inicial:', error);
+      // Não definir como erro crítico - a Lumi pode funcionar mesmo sem dados iniciais
+    }
+  };
+
+  // Funções de atualização
   const refreshContext = async () => {
     if (!lumiService) return;
 
     try {
       const context = await lumiService.getUserContext();
       setUserContext(context);
+      console.log('✅ Contexto atualizado');
     } catch (error) {
-      console.error('Erro ao atualizar contexto:', error);
+      console.error('❌ Erro ao atualizar contexto:', error);
     }
   };
 
-  // Atualizar memórias
   const refreshMemories = async () => {
     if (!lumiService) return;
 
     try {
-      const newMemories = await lumiService.getUserMemories(undefined, 20);
+      const newMemories = await lumiService.getUserMemories(undefined, 10);
       setMemories(newMemories);
+      console.log('✅ Memórias atualizadas:', newMemories.length);
     } catch (error) {
-      console.error('Erro ao atualizar memórias:', error);
+      console.error('❌ Erro ao atualizar memórias:', error);
     }
   };
 
-  // Atualizar insights
   const refreshInsights = async () => {
     if (!lumiService) return;
 
     try {
       const newInsights = await lumiService.getProductivityInsights();
       setInsights(newInsights);
+      console.log('✅ Insights atualizados:', newInsights.length);
     } catch (error) {
-      console.error('Erro ao atualizar insights:', error);
+      console.error('❌ Erro ao atualizar insights:', error);
     }
   };
 
@@ -163,9 +176,10 @@ export const LumiProvider: React.FC<LumiProviderProps> = ({ children }) => {
 export const useLumiContext = (): LumiContextType => {
   const context = useContext(LumiContext);
   if (context === undefined) {
-    throw new Error('useLumiContext deve ser usado dentro de um LumiProvider');
+    throw new Error('useLumiContext must be used within a LumiProvider');
   }
   return context;
 };
 
-export default LumiContext;
+// Alias para compatibilidade
+export const useLumi = useLumiContext;
