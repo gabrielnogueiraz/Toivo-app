@@ -15,7 +15,7 @@ import Board from "./pages/Board";
 import Profile from "./pages/Profile";
 import GardenPage from "./pages/GardenPage";
 import LumiPage from "./pages/Lumi";
-import LumiTestPage from "./pages/LumiTest";
+import TokenDebug from "./pages/TokenDebug";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +31,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
+
             {/* Rotas autenticadas */}
             <Route element={<AuthenticatedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -39,13 +39,13 @@ const App = () => (
               <Route path="/boards" element={<BoardsPage />} />
               <Route path="/board/:boardId" element={<Board />} />
               <Route path="/garden" element={<GardenPage />} />
-              <Route path="/lumi" element={<LumiPage />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
-            
-            {/* Rotas de teste/desenvolvimento */}
-            <Route path="/lumi-test" element={<LumiTestPage />} />
-            
+
+            {/* Rotas públicas da Lumi - não exigem autenticação obrigatória */}
+            <Route path="/lumi" element={<LumiPage />} />
+            <Route path="/token-debug" element={<TokenDebug />} />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
