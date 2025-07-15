@@ -27,14 +27,22 @@ const Navbar = () => {
 
   const authLinksDesktop = (
     <div className="hidden md:flex items-center space-x-4">
-      <span className="text-sm text-slate-300">Olá, {user?.name?.split(' ')[0]}</span>
+      <div className="flex items-center space-x-3">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-violet-600 flex items-center justify-center">
+          <span className="text-white text-sm font-semibold">
+            {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase()}
+          </span>
+        </div>
+        <span className="text-sm text-slate-300">Olá, {user?.name?.split(' ')[0] || user?.email?.split('@')[0]}</span>
+      </div>
       <Button
         variant="outline"
         size="sm"
         onClick={handleLogout}
-        className="border-red-500/30 text-red-300 hover:bg-red-500/10 hover:border-red-400 transition-all duration-200 text-sm px-4 py-2"
+        className="relative overflow-hidden group border-2 border-red-500/40 text-red-300 hover:text-white bg-transparent hover:bg-red-600 transition-all duration-300 text-sm px-6 py-2.5 rounded-xl font-medium shadow-lg hover:shadow-red-500/25"
       >
-        Sair
+        <span className="relative z-10">Sair</span>
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-rose-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </Button>
     </div>
   );
@@ -47,28 +55,40 @@ const Navbar = () => {
       <a href="/#preview" className="text-sm lg:text-base text-slate-300 hover:text-white transition-colors duration-200">
         Preview
       </a>
-      {/* <Link to="/login">
+      <a href="/#precos" className="text-sm lg:text-base text-slate-300 hover:text-white transition-colors duration-200">
+        Preços
+      </a>
+      <Link to="/login">
         <Button
           variant="outline"
           size="sm"
-          className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-200 text-sm px-4 py-2"
+          className="relative overflow-hidden group border-2 border-purple-500/40 text-purple-300 hover:text-white bg-transparent hover:bg-purple-600 transition-all duration-300 text-sm px-6 py-2.5 rounded-xl font-medium shadow-lg hover:shadow-purple-500/25"
         >
-          Entrar
+          <span className="relative z-10">Entrar</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </Button>
-      </Link> */}
+      </Link>
     </div>
   );
 
   const authLinksMobile = (
     <div className="space-y-4">
-      <span className="block text-slate-300 py-2">Olá, {user?.name?.split(' ')[0]}</span>
+      <div className="flex items-center space-x-3 py-2">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-violet-600 flex items-center justify-center">
+          <span className="text-white text-sm font-semibold">
+            {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase()}
+          </span>
+        </div>
+        <span className="text-slate-300">Olá, {user?.name?.split(' ')[0] || user?.email?.split('@')[0]}</span>
+      </div>
       <Button
         variant="outline"
         size="sm"
         onClick={handleLogout}
-        className="w-full border-red-500/30 text-red-300 hover:bg-red-500/10 hover:border-red-400 transition-all duration-200"
+        className="w-full relative overflow-hidden group border-2 border-red-500/40 text-red-300 hover:text-white bg-transparent hover:bg-red-600 transition-all duration-300 rounded-xl font-medium shadow-lg hover:shadow-red-500/25"
       >
-        Sair
+        <span className="relative z-10">Sair</span>
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-rose-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </Button>
     </div>
   );
@@ -89,16 +109,24 @@ const Navbar = () => {
       >
         Preview
       </a>
-      {/* <Link to="/login" className="block">
+      <a
+        href="/#precos"
+        className="block text-slate-300 hover:text-white transition-colors duration-200 py-2"
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        Preços
+      </a>
+      <Link to="/login" className="block">
         <Button
           variant="outline"
           size="sm"
-          className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-200"
+          className="w-full relative overflow-hidden group border-2 border-purple-500/40 text-purple-300 hover:text-white bg-transparent hover:bg-purple-600 transition-all duration-300 rounded-xl font-medium shadow-lg hover:shadow-purple-500/25"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          Entrar
+          <span className="relative z-10">Entrar</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </Button>
-      </Link> */}
+      </Link>
     </div>
   );
 
