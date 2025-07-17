@@ -1,24 +1,56 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Grid, List, Calendar, Edit3, Check, X } from 'lucide-react';
+import { Plus, Search, Grid, List, Calendar, Edit3, Check, X, MoreHorizontal, Edit2, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useBoards, useCreateBoard } from '@/hooks';
+import { useBoards, useCreateBoard, useUpdateBoard, useDeleteBoard } from '@/hooks';
 import { cn, formatRelativeTime } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Board } from '@/types/board';
+import { useToast } from '@/hooks/use-toast';
 
 export default function BoardsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isCreatingBoard, setIsCreatingBoard] = useState(false);
   const [newBoardName, setNewBoardName] = useState('');
+  const [editingBoard, setEditingBoard] = useState<Board | null>(null);
+  const [editBoardName, setEditBoardName] = useState('');
+  const [boardToDelete, setBoardToDelete] = useState<Board | null>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const { data: boards, isLoading } = useBoards();
   const { mutate: createBoard, isPending: isCreating } = useCreateBoard();
+  const { mutate: updateBoard, isPending: isUpdating } = useUpdateBoard();
+  const { mutate: deleteBoard, isPending: isDeleting } = useDeleteBoard();
 
   const filteredBoards = boards?.filter(board =>
     board.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -53,6 +85,94 @@ export default function BoardsPage() {
 
   const handleBoardClick = (boardId: string) => {
     navigate(`/board/${boardId}`);
+  };
+
+  const handleEditBoard = (board: Board, e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita que o click no card seja acionado
+    setEditingBoard(board);
+    setEditBoardName(board.title);
+  };
+
+  const handleUpdateBoard = () => {
+    if (editingBoard && editBoardName.trim()) {
+      updateBoard({
+        id: editingBoard.id,
+        data: { title: editBoardName.trim() }
+      }, {
+        onSuccess: () => {
+          setEditingBoard(null);
+          setEditBoardName('');
+          toast({
+            title: "Quadro atualizado",
+            description: `O nome do quadro foi alterado para "${editBoardName.trim()}".`,
+          });
+        },
+        onError: (error: any) => {
+          console.error('Erro ao atualizar board:', error);
+          toast({
+            title: "Erro ao atualizar quadro",
+            description: "Ocorreu um erro ao tentar atualizar o quadro. Tente novamente.",
+            variant: "destructive",
+          });
+        }
+      });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingBoard(null);
+    setEditBoardName('');
+  };
+
+  const handleEditKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleUpdateBoard();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
+
+  const handleDeleteBoard = (board: Board, e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita que o click no card seja acionado
+    setBoardToDelete(board);
+  };
+
+  const confirmDeleteBoard = () => {
+    if (boardToDelete) {
+      deleteBoard(boardToDelete.id, {
+        onSuccess: () => {
+          setBoardToDelete(null);
+          toast({
+            title: "Quadro excluído",
+            description: `O quadro "${boardToDelete.title}" foi removido com sucesso.`,
+          });
+        },
+        onError: (error: any) => {
+          console.error('Erro ao deletar board:', error);
+          setBoardToDelete(null);
+          
+          // Verificar se é erro de feature PRO
+          if (error?.response?.data === 'PRO FEATURE ONLY' || 
+              (error?.response?.status === 400 && error?.response?.data?.includes?.('PRO'))) {
+            toast({
+              title: "Funcionalidade PRO",
+              description: "A exclusão de quadros está disponível apenas para usuários PRO. Faça upgrade da sua conta para acessar esta funcionalidade.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Erro ao excluir quadro",
+              description: "Ocorreu um erro ao tentar excluir o quadro. Tente novamente.",
+              variant: "destructive",
+            });
+          }
+        }
+      });
+    }
+  };
+
+  const cancelDeleteBoard = () => {
+    setBoardToDelete(null);
   };
 
   const getBoardStats = (board: any) => {
@@ -251,17 +371,46 @@ export default function BoardsPage() {
                     className="group"
                   >
                     <Card 
-                      className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/30 touch-target"
+                      className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/30 touch-target relative group"
                       onClick={() => handleBoardClick(board.id)}
                     >
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
-                          <CardTitle className="text-base md:text-lg group-hover:text-primary transition-colors line-clamp-2">
+                          <CardTitle className="text-base md:text-lg group-hover:text-primary transition-colors line-clamp-2 flex-1 pr-2">
                             {board.title}
                           </CardTitle>
-                          <Badge variant="secondary" className="text-xs">
-                            {board.columns.length} colunas
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {board.columns.length} colunas
+                            </Badge>
+                            
+                            {/* Menu de opções */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity touch-target"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <MoreHorizontal className="w-3 h-3" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem onClick={(e) => handleEditBoard(board, e)}>
+                                  <Edit2 className="w-4 h-4 mr-2" />
+                                  Editar quadro
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={(e) => handleDeleteBoard(board, e)}
+                                  className="text-destructive focus:text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Deletar quadro
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
                       </CardHeader>
                       
@@ -306,6 +455,60 @@ export default function BoardsPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Modal de Edição de Board */}
+      <Dialog open={!!editingBoard} onOpenChange={(open) => !open && handleCancelEdit()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Quadro</DialogTitle>
+            <DialogDescription>
+              Altere o nome do seu quadro
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              value={editBoardName}
+              onChange={(e) => setEditBoardName(e.target.value)}
+              onKeyDown={handleEditKeyPress}
+              placeholder="Nome do quadro..."
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelEdit}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleUpdateBoard} 
+              disabled={!editBoardName.trim() || isUpdating}
+            >
+              {isUpdating ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de confirmação de exclusão */}
+      <AlertDialog open={!!boardToDelete} onOpenChange={(open) => !open && cancelDeleteBoard()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir quadro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. O quadro "{boardToDelete?.title}" e todas as suas tarefas serão permanentemente removidos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteBoard}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Excluindo...' : 'Excluir'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
