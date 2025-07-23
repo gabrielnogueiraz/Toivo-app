@@ -5,6 +5,7 @@ import TeaserSection from '@/components/TeaserSection';
 import LumiSection from '@/components/LumiSection';
 import GardenSection from '@/components/GardenSection';
 import FeaturesSection from '@/components/FeaturesSection';
+import PricingSection from '@/components/PricingSection';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
 
@@ -214,11 +215,15 @@ const Index = () => {
           <FeaturesSection />
         </StaggeredReveal>
 
-        {/* <AnimatedSection delay={0.5} direction="fade">
+        <AnimatedSection delay={0.5} direction="scale">
+          <PricingSection />
+        </AnimatedSection>
+
+        {/* <AnimatedSection delay={0.6} direction="fade">
           <CTASection />
         </AnimatedSection> */}
 
-        <AnimatedSection delay={0.6} direction="up">
+        <AnimatedSection delay={0.7} direction="up">
           <Footer />
         </AnimatedSection>
       </div>
