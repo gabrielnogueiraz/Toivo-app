@@ -8,9 +8,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
-import { PanelRightClose, PanelRightOpen, Loader2, RefreshCw } from 'lucide-react';
+import { PanelRightClose, PanelRightOpen, Loader2, RefreshCw, AlertTriangle, Lock } from 'lucide-react';
 import SystemNavbar from '@/components/SystemNavbar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import lumiLogo from '@/assets/LumiLogo.png';
 
 const LumiContent: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // Iniciando como fechada
@@ -25,7 +26,10 @@ const LumiContent: React.FC = () => {
         <SystemNavbar />
         <div className="h-[calc(100vh-4rem)] flex items-center justify-center bg-background">
           <div className="text-center space-y-4">
-            <h2 className="text-2xl font-bold">🔐 Acesso Restrito</h2>
+            <div className="w-12 h-12 mx-auto rounded-full bg-white flex items-center justify-center shadow-md">
+              <Lock className="w-6 h-6 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold">Acesso Restrito</h2>
             <p className="text-muted-foreground">
               Você precisa estar logado no Toivo para conversar com a Lumi
             </p>
@@ -45,8 +49,10 @@ const LumiContent: React.FC = () => {
         <SystemNavbar />
         <div className="h-[calc(100vh-4rem)] flex items-center justify-center bg-background">
           <div className="text-center space-y-4">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto" />
-            <h2 className="text-xl font-semibold">🔄 Preparando Lumi...</h2>
+            <div className="w-12 h-12 mx-auto">
+              <img src={lumiLogo} alt="Lumi" className="w-full h-full opacity-50" />
+            </div>
+            <h2 className="text-xl font-semibold">Preparando Lumi...</h2>
             <p className="text-muted-foreground">
               Configurando integração com sistema Toivo...
             </p>
@@ -63,7 +69,10 @@ const LumiContent: React.FC = () => {
         <SystemNavbar />
         <div className="h-[calc(100vh-4rem)] flex items-center justify-center bg-background">
           <div className="max-w-md text-center space-y-4">
-            <h2 className="text-xl font-semibold text-destructive">❌ Erro na Integração</h2>
+            <div className="w-12 h-12 mx-auto rounded-full bg-white flex items-center justify-center shadow-md">
+              <AlertTriangle className="w-6 h-6 text-destructive" />
+            </div>
+            <h2 className="text-xl font-semibold text-destructive">Erro na Integração</h2>
             <Alert>
               <AlertDescription>
                 Não foi possível conectar com a Lumi: {error}
@@ -88,7 +97,10 @@ const LumiContent: React.FC = () => {
         <SystemNavbar />
         <div className="h-[calc(100vh-4rem)] flex items-center justify-center bg-background">
           <div className="text-center space-y-4">
-            <h2 className="text-xl font-semibold">⚠️ Lumi Indisponível</h2>
+            <div className="w-12 h-12 mx-auto rounded-full bg-white flex items-center justify-center shadow-md">
+              <AlertTriangle className="w-6 h-6 text-yellow-500" />
+            </div>
+            <h2 className="text-xl font-semibold">Lumi Indisponível</h2>
             <p className="text-muted-foreground">
               A integração com a Lumi não está funcionando no momento.
             </p>
@@ -113,9 +125,17 @@ const LumiContent: React.FC = () => {
           {/* Mobile Header */}
           <div className="flex items-center justify-between p-4 border-b lg:hidden">
             <div>
-              <h1 className="text-lg font-semibold">Lumi</h1>
-              <p className="text-xs text-muted-foreground">
-                ✅ Conectado como {user.name}
+              <div className="flex items-center gap-2">
+                <div className="w-16 h-16">
+                  <img src={lumiLogo} alt="Lumi" className="w-full h-full" />
+                </div>
+                <h1 className="text-lg font-semibold">Lumi</h1>
+              </div>
+              <p className="text-xs text-muted-foreground flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                </div>
+                Conectado como {user.name}
               </p>
             </div>
             <Button
