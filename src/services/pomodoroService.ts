@@ -11,6 +11,7 @@ export interface PomodoroTasksParams {
   boardId?: string;
   priority?: 'LOW' | 'MEDIUM' | 'HIGH';
   search?: string;
+  completed?: boolean;
 }
 
 export interface PomodoroTasksResponse {
@@ -75,6 +76,7 @@ export const getPomodoroTasks = async (params?: PomodoroTasksParams): Promise<Po
   if (params?.boardId) searchParams.append('boardId', params.boardId);
   if (params?.priority) searchParams.append('priority', params.priority);
   if (params?.search) searchParams.append('search', params.search);
+  if (params?.completed !== undefined) searchParams.append('completed', params.completed.toString());
 
   const url = `/pomodoro/tasks${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
   const response = await apiClient.get<ApiResponse<PomodoroTasksResponse>>(url);
