@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { usePomodoroTasks, useStartPomodoro } from '@/hooks';
+import { PomodoroTasksParams } from '@/services/pomodoroService';
 import { PomodoroTask } from '@/types/board';
 import { cn } from '@/lib/utils';
 import { TaskFlowerIndicator } from './TaskFlowerIndicator';
@@ -33,6 +34,7 @@ export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: T
   const { data: tasks = [], isLoading, error } = usePomodoroTasks({
     search: search || undefined,
     priority: priority === 'ALL' ? undefined : priority,
+    completed: false, // Filtrar apenas tarefas não concluídas
   });
 
   const { mutate: startPomodoro, isPending: isStarting } = useStartPomodoro();
