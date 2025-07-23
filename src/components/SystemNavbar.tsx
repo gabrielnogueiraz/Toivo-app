@@ -10,7 +10,8 @@ import {
   Settings,
   Menu,
   Flower2,
-  Sparkles
+  Sparkles,
+  BarChart3
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -48,6 +49,7 @@ export default function SystemNavbar() {
       path: '/dashboard',
       active: location.pathname === '/dashboard'
     },
+
     {
       label: 'Pomodoro',
       icon: Timer,
