@@ -95,6 +95,8 @@ export const useTaskCompletion = () => {
 
   const handleTaskCompletion = async (completion: TaskCompletionResult) => {
     try {
+      console.log('🎯 Processando conclusão de tarefa:', completion);
+      
       // Invalidar cache de tarefas para atualizar UI
       queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
       
@@ -104,6 +106,8 @@ export const useTaskCompletion = () => {
         ? `🌸 Parabéns! Você concluiu a tarefa e ganhou ${completion.flowersCount} flor(es)!`
         : 'Tarefa marcada como concluída. Complete todos os pomodoros para ganhar flores.';
       
+      console.log('📢 Mostrando notificação:', { type: notificationType, message: completion.message || notificationMessage });
+      
       showNotification({
         type: notificationType,
         message: completion.message || notificationMessage,
@@ -112,6 +116,7 @@ export const useTaskCompletion = () => {
 
       // Se flores lendárias foram criadas, mostrar celebração especial
       if (completion.legendaryFlowers && completion.legendaryFlowers > 0) {
+        console.log('👑 Flores lendárias criadas:', completion.legendaryFlowers);
         // Determinar nome da flor lendária baseado na resposta ou usar padrão
         const flowerName = completion.message?.includes('Coragem') ? 'Flor da Coragem' :
                           completion.message?.includes('Foco Total') ? 'Flor Rubra do Foco Total' :
@@ -120,22 +125,26 @@ export const useTaskCompletion = () => {
         
         triggerLegendaryFlowerCelebration(flowerName, completion.legendaryFlowers);
       } else if (completion.flowersCreated) {
+        console.log('🌸 Flores normais criadas:', completion.flowersCount);
         // Para flores normais, mostrar notificação especial
         showNotification({
           type: 'success',
-          message: `🌸 Parabéns! Você concluiu a tarefa e ganhou ${completion.flowersCount || 1} flor(es)! Sua dedicação está florescendo!`,
+          message: `Parabéns! Você concluiu a tarefa e ganhou ${completion.flowersCount || 1} flor(es)! Sua dedicação está florescendo!`,
           duration: 4000
         });
       }
       
       // Atualizar dados do jardim
+      console.log('🔄 Atualizando dados do jardim...');
       await Promise.all([
         fetchStats(),
         fetchFlowers()
       ]);
       
+      console.log('✅ Dados do jardim atualizados com sucesso');
+      
     } catch (error) {
-      console.error('Erro ao processar completion da tarefa:', error);
+      console.error('❌ Erro ao processar completion da tarefa:', error);
     }
   };
 

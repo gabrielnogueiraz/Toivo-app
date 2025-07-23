@@ -39,13 +39,13 @@ export const useGardenRealtime = () => {
     }
 
     const handleFlowerCreated = (event: FlowerEvent) => {
-      console.log('🌸 Nova flor criada:', event.data);
+      console.log('Nova flor criada:', event.data);
       addFlower(event.data);
       fetchStats(); // Atualiza estatísticas
     };
 
     const handleFlowerUpdated = (event: FlowerEvent) => {
-      console.log('🌼 Flor atualizada:', event.data);
+      console.log('Flor atualizada:', event.data);
       updateFlowerInStore(event.data);
     };
 
