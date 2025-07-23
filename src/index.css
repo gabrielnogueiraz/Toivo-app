@@ -615,3 +615,210 @@ All colors MUST be HSL.
     @apply bg-primary/10 text-primary px-2 py-1 rounded-md font-medium;
   }
 }
+
+/* Estilos minimalistas para a nova interface da Lumi */
+@layer components {
+  /* Estilos minimalistas para a nova interface da Lumi */
+  .lumi-minimal-container {
+    @apply bg-background text-foreground font-sans;
+  }
+  
+  .lumi-minimal-header {
+    @apply bg-background/95 backdrop-blur-sm border-b border-border/20;
+  }
+  
+  .lumi-minimal-message {
+    @apply leading-relaxed font-normal text-foreground/90;
+  }
+  
+  .lumi-minimal-message.user {
+    @apply text-foreground font-normal;
+  }
+  
+  .lumi-minimal-input {
+    @apply bg-background border border-border/40 rounded-2xl shadow-sm 
+           hover:shadow-md hover:border-border/60 
+           focus-within:border-primary/30 focus-within:shadow-md 
+           transition-all duration-200;
+  }
+  
+  .lumi-minimal-textarea {
+    @apply bg-transparent border-0 outline-none resize-none
+           text-sm font-normal leading-relaxed
+           placeholder:text-muted-foreground/50 placeholder:font-normal;
+  }
+  
+  .lumi-minimal-button {
+    @apply rounded-xl border-0 transition-all duration-200 font-medium;
+  }
+  
+  .lumi-minimal-button.send {
+    @apply bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary;
+  }
+  
+  .lumi-minimal-button.send.active {
+    @apply bg-primary hover:bg-primary/90 text-primary-foreground hover:text-primary-foreground;
+  }
+  
+  .lumi-minimal-suggestion {
+    @apply text-left p-3 rounded-xl border border-border/40
+           text-sm text-muted-foreground hover:text-foreground
+           bg-background hover:bg-muted/20
+           transition-all duration-200
+           hover:border-border/60 hover:shadow-sm;
+  }
+  
+  .lumi-minimal-welcome {
+    @apply text-center space-y-6;
+  }
+  
+  .lumi-minimal-welcome h1 {
+    @apply text-2xl font-medium text-foreground;
+  }
+  
+  .lumi-minimal-welcome p {
+    @apply text-muted-foreground leading-relaxed;
+  }
+  
+  .lumi-typing-dots {
+    @apply flex items-center gap-1;
+  }
+  
+  .lumi-typing-dot {
+    @apply w-1.5 h-1.5 bg-muted-foreground/40 rounded-full animate-bounce;
+  }
+  
+  .lumi-typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .lumi-typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  .lumi-streaming-cursor {
+    @apply inline-block w-0.5 h-4 bg-foreground/40 ml-1 animate-pulse;
+  }
+  
+  .lumi-error-message {
+    @apply p-3 rounded-xl bg-destructive/10 border border-destructive/20 
+           text-destructive text-sm;
+  }
+  
+  /* Scrollbar minimalista */
+  .lumi-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .lumi-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .lumi-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.2);
+    border-radius: 3px;
+  }
+  
+  .lumi-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.3);
+  }
+  
+  /* Layout responsivo para mensagens */
+  .lumi-message-layout {
+    @apply max-w-4xl mx-auto space-y-0;
+  }
+  
+  .lumi-message-group {
+    @apply mb-8 max-w-none;
+  }
+  
+  .lumi-message-group.user {
+    @apply ml-auto max-w-[85%];
+  }
+  
+  .lumi-message-group.assistant {
+    @apply mr-auto max-w-full;
+  }
+  
+  .lumi-message-label {
+    @apply text-xs font-medium mb-2 opacity-60;
+  }
+  
+  .lumi-message-label.user {
+    @apply text-right text-foreground;
+  }
+  
+  .lumi-message-label.assistant {
+    @apply text-left text-muted-foreground;
+  }
+}
+
+/* Animações refinadas */
+@keyframes lumi-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lumi-pulse-gentle {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.6; 
+  }
+}
+
+@keyframes lumi-bounce-gentle {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-2px); 
+  }
+}
+
+.lumi-fade-in {
+  animation: lumi-fade-in 0.3s ease-out;
+}
+
+.lumi-pulse-gentle {
+  animation: lumi-pulse-gentle 1.5s ease-in-out infinite;
+}
+
+.lumi-bounce-gentle {
+  animation: lumi-bounce-gentle 1.4s ease-in-out infinite;
+}
+
+/* Tipografia refinada para prosa */
+.lumi-prose {
+  @apply prose prose-sm max-w-none leading-relaxed;
+  @apply prose-headings:text-foreground prose-headings:font-medium prose-headings:text-base;
+  @apply prose-p:text-foreground prose-p:leading-relaxed prose-p:mb-3;
+  @apply prose-strong:text-foreground prose-strong:font-medium;
+  @apply prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground;
+  @apply prose-code:text-primary prose-code:bg-muted/50 prose-code:px-1 prose-code:rounded prose-code:text-xs;
+  @apply [&>*:first-child]:mt-0 [&>*:last-child]:mb-0;
+}
+
+/* Estados de conexão */
+.lumi-connection-indicator {
+  @apply w-2 h-2 rounded-full;
+}
+
+.lumi-connection-indicator.connected {
+  @apply bg-green-500/60;
+}
+
+.lumi-connection-indicator.disconnected {
+  @apply bg-red-500/60 animate-pulse;
+}
+
+.lumi-connection-indicator.loading {
+  @apply bg-yellow-500/60 lumi-pulse-gentle;
+}
