@@ -207,8 +207,8 @@ export default function PomodoroPage() {
       >
         <div>
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Timer Pomodoro</h1>
-          <p className="text-muted-foreground text-sm md:text-base">
-            Transforme sua produtividade com foco e elegância
+          <p className="text-muted-foreground text-sm md:text-base mb-6">
+            Selecione uma tarefa abaixo para começar a cultivar sua flor
           </p>
         </div>
       </motion.div>
@@ -321,11 +321,8 @@ export default function PomodoroPage() {
                           progress={getFlowerProgress()}
                           isActive={isRunning}
                           priority={getTaskPriority()}
-                          onStart={handleStart}
-                          onPause={handlePause}
-                          onReset={handleReset}
-                          onOpenSettings={() => setIsSettingsOpen(true)}
-                          isRunning={isRunning}
+                          size="lg"
+                          isLegendary={getTaskPriority() === 'HIGH' && Math.random() < 0.1}
                         />
                         
                         {!activePomodoro && mode === 'work' && (
