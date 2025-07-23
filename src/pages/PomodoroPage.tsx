@@ -1,16 +1,28 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Clock, Target, TrendingUp, Timer, Flower } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Timer, 
+  Target, 
+  Coffee, 
+  Star, 
+  Play, 
+  Pause, 
+  RotateCcw, 
+  Settings,
+  CheckCircle2,
+  Clock,
+  Flower2
+} from 'lucide-react';
 import { TaskSelector } from '@/components/TaskSelector';
-import { EnhancedTimerDisplay } from '@/components/EnhancedTimerDisplay';
 import { MagicalFlowerGrowth } from '@/components/MagicalFlowerGrowth';
 import { PomodoroSettingsModal } from '@/components/PomodoroSettingsModal';
 import { useActivePomodoro, useStartPomodoro, usePausePomodoro, useFinishPomodoro } from '@/hooks';
 import { useEffectivePomodoroSettings } from '@/hooks/useEffectivePomodoroSettings';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
 export default function PomodoroPage() {
   const { data: activePomodoro } = useActivePomodoro();
@@ -19,20 +31,14 @@ export default function PomodoroPage() {
   const { mutate: pausePomodoro } = usePausePomodoro();
   const { mutate: finishPomodoro } = useFinishPomodoro();
   
-  const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutos default
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [totalTime, setTotalTime] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [mode, setMode] = useState<'work' | 'shortBreak' | 'longBreak'>('work');
   const [sessionCount, setSessionCount] = useState(1);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showTaskSelector, setShowTaskSelector] = useState(false);
   const [viewMode, setViewMode] = useState<'timer' | 'flower'>('timer');
-
-  const [todayStats, setTodayStats] = useState({
-    completedPomodoros: 0,
-    totalFocusTime: 0,
-    completedTasks: 0,
-    streak: 0
-  });
 
   // Atualizar tempos baseado nas configurações do usuário
   useEffect(() => {
@@ -54,7 +60,6 @@ export default function PomodoroPage() {
     if (activePomodoro) {
       setIsRunning(activePomodoro.status === 'IN_PROGRESS');
       
-      // Calcular tempo restante baseado no pomodoro ativo
       const now = new Date();
       const startedAt = new Date(activePomodoro.startedAt);
       const elapsed = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
@@ -66,12 +71,27 @@ export default function PomodoroPage() {
     }
   }, [activePomodoro]);
 
+  // Timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isRunning && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && activePomodoro) {
+      setIsRunning(false);
+      finishPomodoro(activePomodoro.id);
+    }
+
+    return () => clearInterval(interval);
+  }, [isRunning, timeLeft, activePomodoro, finishPomodoro]);
+
   const handleStart = () => {
     if (activePomodoro) {
       setIsRunning(true);
     } else {
-      // Agora a seleção de tarefa é feita pelo TaskSelector
-      console.log('Selecione uma tarefa primeiro');
+      setShowTaskSelector(true);
     }
   };
 
@@ -88,7 +108,6 @@ export default function PomodoroPage() {
     }
     setIsRunning(false);
     
-    // Resetar para configurações do usuário
     if (settings) {
       const duration = mode === 'work' 
         ? settings.focusDuration 
@@ -102,20 +121,8 @@ export default function PomodoroPage() {
     }
   };
 
-  const handlePlayPause = () => {
-    if (isRunning) {
-      handlePause();
-    } else {
-      handleStart();
-    }
-  };
-
   const handleSwitchMode = (newMode: 'work' | 'shortBreak' | 'longBreak') => {
-    // Não permitir mudança de modo se há um pomodoro ativo
-    if (activePomodoro) {
-      console.log('Não é possível mudar de modo com pomodoro ativo');
-      return;
-    }
+    if (activePomodoro) return;
     
     setMode(newMode);
     setIsRunning(false);
@@ -133,279 +140,429 @@ export default function PomodoroPage() {
     }
   };
 
-  const getModeLabel = () => {
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const progress = totalTime > 0 ? ((totalTime - timeLeft) / totalTime) * 100 : 0;
+
+  const getModeConfig = () => {
     switch (mode) {
-      case 'work':
-        return 'Foco';
+              case 'work':
+          return {
+            label: 'Foco',
+            icon: Target,
+            color: 'text-primary',
+            bgColor: 'bg-primary/10 dark:bg-primary/5',
+            borderColor: 'border-primary/20 dark:border-primary/10'
+          };
       case 'shortBreak':
-        return 'Pausa Curta';
+        return {
+          label: 'Pausa Curta',
+          icon: Coffee,
+          color: 'text-emerald-500',
+          bgColor: 'bg-emerald-50 dark:bg-emerald-950/20',
+          borderColor: 'border-emerald-200 dark:border-emerald-800'
+        };
       case 'longBreak':
-        return 'Pausa Longa';
-      default:
-        return 'Foco';
+        return {
+          label: 'Descanso Longo',
+          icon: Star,
+          color: 'text-purple-500',
+          bgColor: 'bg-purple-50 dark:bg-purple-950/20',
+          borderColor: 'border-purple-200 dark:border-purple-800'
+        };
+              default:
+          return {
+            label: 'Foco',
+            icon: Target,
+            color: 'text-primary',
+            bgColor: 'bg-primary/10 dark:bg-primary/5',
+            borderColor: 'border-primary/20 dark:border-primary/10'
+          };
     }
   };
 
-  const getModeColor = () => {
-    switch (mode) {
-      case 'work':
-        return 'bg-primary';
-      case 'shortBreak':
-        return 'bg-emerald-500';
-      case 'longBreak':
-        return 'bg-purple-500';
-      default:
-        return 'bg-primary';
-    }
-  };
-
-  // Calcular progresso da flor baseado no timer
-  const getFlowerProgress = () => {
-    if (totalTime === 0) return 0;
-    return ((totalTime - timeLeft) / totalTime) * 100;
-  };
-
-  // Determinar tipo de flor baseado no modo e duração
-  const getFlowerType = (): 'common' | 'rare' | 'legendary' => {
-    if (mode === 'longBreak') return 'legendary';
-    if (mode === 'work' && totalTime >= 45 * 60) return 'rare'; // 45+ minutos
-    return 'common';
-  };
-
-  // Obter prioridade da tarefa ativa
-  const getTaskPriority = (): 'LOW' | 'MEDIUM' | 'HIGH' => {
-    if (activePomodoro?.task?.priority) {
-      return activePomodoro.task.priority;
-    }
-    return 'MEDIUM'; // Default para quando não há tarefa ativa
-  };
-
-  // Timer effect com integração de completion automática
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isRunning && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0 && activePomodoro) {
-      // Timer chegou ao fim - finalizar pomodoro automaticamente
-      setIsRunning(false);
-      finishPomodoro(activePomodoro.id);
-    }
-
-    return () => clearInterval(interval);
-  }, [isRunning, timeLeft, activePomodoro, finishPomodoro]);
+  const modeConfig = getModeConfig();
 
   return (
-    <div className="h-full">
-      {/* Header Section - Seguindo o padrão do Dashboard/Boards */}
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center justify-between p-4 md:p-6 border-b gap-4"
+        className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b"
       >
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Timer Pomodoro</h1>
-          <p className="text-muted-foreground text-sm md:text-base mb-6">
-            Selecione uma tarefa abaixo para começar a cultivar sua flor
-          </p>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Timer Pomodoro</h1>
+              <p className="text-sm text-muted-foreground">
+                Técnica de produtividade focada
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSettingsOpen(true)}
+              className="gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Configurações
+            </Button>
+          </div>
         </div>
       </motion.div>
 
       {/* Main Content */}
-      <div className="p-4 md:p-6">
+      <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="space-y-8">
-            
-            {/* Timer Section - Centralizado */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="w-full"
-            >
-              <Card className="p-6 md:p-8 w-full">
-                <div className="relative z-10">
-                  {/* Mode and Session Info */}
-                  <div className="flex items-center justify-center gap-3 mb-6">
-                    <div className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium text-white shadow-lg transition-all duration-300",
-                      getModeColor(),
-                      "hover:scale-105"
-                    )}>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        {getModeLabel()}
-                      </div>
-                    </div>
-                    <div className="px-3 py-1 rounded-full bg-muted text-sm text-muted-foreground">
+          
+          {/* Timer Central */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="mb-12"
+          >
+            <Card className={cn(
+              "border-2 transition-all duration-300",
+              modeConfig.borderColor,
+              modeConfig.bgColor
+            )}>
+              <CardContent className="p-8 md:p-12">
+                
+                {/* Mode Indicator */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center mb-8"
+                >
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/50 backdrop-blur-sm">
+                    <modeConfig.icon className={cn("w-4 h-4", modeConfig.color)} />
+                    <span className={cn("text-sm font-medium", modeConfig.color)}>
+                      {modeConfig.label}
+                    </span>
+                    <Badge variant="outline" className="ml-2">
                       Sessão {sessionCount}
+                    </Badge>
+                  </div>
+                </motion.div>
+
+                                 {/* Active Task Display */}
+                 <AnimatePresence>
+                   {activePomodoro?.task && (
+                     <motion.div
+                       initial={{ opacity: 0, scale: 0.95 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       exit={{ opacity: 0, scale: 0.95 }}
+                       className="text-center mb-8"
+                     >
+                       <div className="inline-flex items-center gap-3 px-6 py-3 bg-background rounded-full border">
+                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                         <span className="text-sm text-muted-foreground">Trabalhando em:</span>
+                         <span className="font-medium">{activePomodoro.task.title}</span>
+                       </div>
+                     </motion.div>
+                   )}
+                 </AnimatePresence>
+
+                 {/* View Toggle */}
+                 <div className="flex justify-center mb-8">
+                  <motion.div 
+                    className="inline-flex items-center bg-muted/30 backdrop-blur-sm p-1.5 rounded-2xl border border-border/50 shadow-lg"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    {[
+                      { mode: 'timer', icon: Timer, label: 'Timer' },
+                      { mode: 'flower', icon: Flower2, label: 'Flor Mágica' }
+                    ].map(({ mode: toggleMode, icon: Icon, label }) => (
+                      <motion.div
+                        key={toggleMode}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          variant={viewMode === toggleMode ? 'default' : 'ghost'}
+                          size="sm"
+                          onClick={() => setViewMode(toggleMode as any)}
+                          className={cn(
+                            "rounded-xl gap-2 transition-all duration-300 relative",
+                            viewMode === toggleMode && "shadow-md"
+                          )}
+                        >
+                          <Icon className="w-4 h-4" />
+                          {label}
+                          {viewMode === toggleMode && (
+                            <motion.div
+                              layoutId="activeTab"
+                              className="absolute inset-0 bg-primary/10 rounded-xl -z-10"
+                              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            />
+                          )}
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </div>
+
+                                 {/* Timer or Flower Display */}
+                 <div className="text-center mb-8">
+                   <AnimatePresence mode="wait">
+                     {viewMode === 'timer' ? (
+                       <motion.div
+                         key="timer"
+                         initial={{ opacity: 0, scale: 0.8 }}
+                         animate={{ opacity: 1, scale: 1 }}
+                         exit={{ opacity: 0, scale: 0.8 }}
+                         transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                         className="relative"
+                       >
+                         <div className="text-6xl md:text-8xl font-mono font-bold tracking-tight">
+                           {formatTime(timeLeft)}
+                         </div>
+                         
+                         {/* Progress Ring */}
+                         <div className="absolute inset-0 flex items-center justify-center -z-10">
+                           <svg className="w-full h-full max-w-[200px] md:max-w-[300px] -rotate-90" viewBox="0 0 100 100">
+                             <circle
+                               cx="50"
+                               cy="50"
+                               r="45"
+                               stroke="currentColor"
+                               strokeWidth="2"
+                               fill="none"
+                               className="text-muted-foreground/20"
+                             />
+                             <motion.circle
+                               cx="50"
+                               cy="50"
+                               r="45"
+                               stroke="currentColor"
+                               strokeWidth="2"
+                               fill="none"
+                               className={modeConfig.color}
+                               strokeLinecap="round"
+                               initial={{ strokeDasharray: "0 283" }}
+                               animate={{ strokeDasharray: `${progress * 2.83} 283` }}
+                               transition={{ duration: 0.5, ease: "easeInOut" }}
+                             />
+                           </svg>
+                         </div>
+                         
+                         <Progress value={progress} className="mt-4 h-2" />
+                       </motion.div>
+                     ) : (
+                       <motion.div
+                         key="flower"
+                         initial={{ opacity: 0, scale: 0.8 }}
+                         animate={{ opacity: 1, scale: 1 }}
+                         exit={{ opacity: 0, scale: 0.8 }}
+                         transition={{ duration: 0.5 }}
+                         className="w-full max-w-md mx-auto relative"
+                       >
+                         <MagicalFlowerGrowth
+                           progress={progress}
+                           isActive={isRunning}
+                           priority={activePomodoro?.task?.priority || 'MEDIUM'}
+                           size="lg"
+                           isLegendary={activePomodoro?.task?.priority === 'HIGH' && Math.random() < 0.1}
+                         />
+                         
+                         {/* Elegant task selection overlay */}
+                         <AnimatePresence>
+                           {!activePomodoro && mode === 'work' && (
+                             <motion.div
+                               initial={{ opacity: 0, y: 20 }}
+                               animate={{ opacity: 1, y: 0 }}
+                               exit={{ opacity: 0, y: -20 }}
+                               transition={{ duration: 0.6, ease: "easeOut" }}
+                               className="absolute inset-0 flex items-center justify-center"
+                             >
+                               <motion.div
+                                 animate={{ 
+                                   scale: [1, 1.02, 1],
+                                   opacity: [0.9, 1, 0.9]
+                                 }}
+                                 transition={{ 
+                                   duration: 3, 
+                                   repeat: Infinity, 
+                                   ease: "easeInOut" 
+                                 }}
+                                 className="bg-white/95 backdrop-blur-lg border border-white/30 rounded-2xl px-6 py-4 shadow-2xl"
+                               >
+                                 <div className="flex items-center gap-3">
+                                   <motion.div
+                                     animate={{ rotate: [0, 10, -10, 0] }}
+                                     transition={{ 
+                                       duration: 2, 
+                                       repeat: Infinity, 
+                                       ease: "easeInOut" 
+                                     }}
+                                   >
+                                     <Flower2 className="w-5 h-5 text-primary" />
+                                   </motion.div>
+                                   <div className="text-center">
+                                     <p className="text-sm font-medium text-gray-800 mb-1">
+                                       Pronto para crescer
+                                     </p>
+                                     <p className="text-xs text-gray-600">
+                                       Selecione uma tarefa abaixo ↓
+                                     </p>
+                                   </div>
+                                 </div>
+                               </motion.div>
+                             </motion.div>
+                           )}
+                         </AnimatePresence>
+                       </motion.div>
+                     )}
+                   </AnimatePresence>
+                 </div>
+
+                {/* Controls */}
+                <div className="flex items-center justify-center gap-4">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      onClick={isRunning ? handlePause : handleStart}
+                      size="lg"
+                      className={cn(
+                        "gap-2 px-8 py-3 text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl",
+                        isRunning ? "bg-orange-500 hover:bg-orange-600" : "bg-primary hover:bg-primary/90"
+                      )}
+                    >
+                      {isRunning ? (
+                        <>
+                          <Pause className="w-5 h-5" />
+                          Pausar
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-5 h-5" />
+                          {activePomodoro ? 'Continuar' : 'Iniciar'}
+                        </>
+                      )}
+                    </Button>
+                  </motion.div>
+                  
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      onClick={handleReset}
+                      variant="outline"
+                      size="lg"
+                      className="gap-2 shadow-md hover:shadow-lg transition-all duration-200"
+                      disabled={!activePomodoro && timeLeft === totalTime}
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Resetar
+                    </Button>
+                  </motion.div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Mode Selector */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="flex justify-center">
+              <div className="inline-flex items-center bg-muted/50 backdrop-blur-sm p-1 rounded-2xl border border-border/50 shadow-lg">
+                {[
+                  { mode: 'work', icon: Target, label: 'Foco' },
+                  { mode: 'shortBreak', icon: Coffee, label: 'Pausa' },
+                  { mode: 'longBreak', icon: Star, label: 'Descanso' }
+                ].map(({ mode: buttonMode, icon: Icon, label }) => (
+                  <motion.div
+                    key={buttonMode}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      variant={mode === buttonMode ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => handleSwitchMode(buttonMode as any)}
+                      disabled={!!activePomodoro}
+                      className="rounded-xl gap-2 transition-all duration-200"
+                    >
+                      <Icon className="w-4 h-4" />
+                      {label}
+                    </Button>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Task Selection */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card className="bg-muted/30">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5" />
+                    Seleção de Tarefa
+                  </h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowTaskSelector(!showTaskSelector)}
+                    className="gap-2"
+                  >
+                    <Timer className="w-4 h-4" />
+                    {showTaskSelector ? 'Ocultar' : 'Selecionar Tarefa'}
+                  </Button>
+                </div>
+                
+                {!activePomodoro && !showTaskSelector && (
+                  <div className="text-center py-8">
+                    <div className="text-muted-foreground mb-4">
+                      <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>Clique em "Selecionar Tarefa" para começar um pomodoro</p>
                     </div>
                   </div>
+                )}
 
-                  {/* Active Task Display */}
-                  {activePomodoro?.task && (
+                <AnimatePresence>
+                  {showTaskSelector && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-center mb-6"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted rounded-full">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <span className="text-sm text-muted-foreground">
-                          Trabalhando em:
-                        </span>
-                        <span className="text-sm font-medium">
-                          {activePomodoro.task.title}
-                        </span>
-                      </div>
+                      <TaskSelector 
+                        currentMode={mode}
+                        settings={settings}
+                      />
                     </motion.div>
                   )}
+                </AnimatePresence>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-                  {/* View Mode Toggle */}
-                  <div className="flex justify-center mb-6">
-                    <div className="inline-flex items-center bg-muted p-1 rounded-full">
-                      <Button
-                        variant={viewMode === 'timer' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => setViewMode('timer')}
-                        className={cn(
-                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-                          viewMode === 'timer' 
-                            ? "bg-primary text-primary-foreground shadow-lg" 
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        <Timer className="w-4 h-4 mr-2" />
-                        Timer
-                      </Button>
-                      <Button
-                        variant={viewMode === 'flower' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => setViewMode('flower')}
-                        className={cn(
-                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-                          viewMode === 'flower' 
-                            ? "bg-emerald-500 text-white shadow-lg" 
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        <Flower className="w-4 h-4 mr-2" />
-                        Flor Mágica
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Enhanced Timer Display or Magical Flower Growth */}
-                  <div className="flex justify-center mb-8">
-                    {viewMode === 'timer' ? (
-                      <EnhancedTimerDisplay
-                        timeLeft={timeLeft}
-                        totalTime={totalTime}
-                        isRunning={isRunning}
-                        mode={mode}
-                        onStart={handleStart}
-                        onPause={handlePause}
-                        onReset={handleReset}
-                        onOpenSettings={() => setIsSettingsOpen(true)}
-                      />
-                    ) : (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5 }}
-                        className="w-full max-w-md"
-                      >
-                        <MagicalFlowerGrowth
-                          progress={getFlowerProgress()}
-                          isActive={isRunning}
-                          priority={getTaskPriority()}
-                          size="lg"
-                          isLegendary={getTaskPriority() === 'HIGH' && Math.random() < 0.1}
-                        />
-                        
-                        {!activePomodoro && mode === 'work' && (
-                          <motion.p
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-center text-sm text-muted-foreground mt-4"
-                          >
-                            Selecione uma tarefa abaixo para começar a cultivar sua flor! 🌱
-                          </motion.p>
-                        )}
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* Mode Selector - Clean Design */}
-                  <div className="flex items-center justify-center">
-                    <div className="inline-flex items-center bg-muted p-1 rounded-full">
-                      <Button
-                        variant={mode === 'work' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => handleSwitchMode('work')}
-                        disabled={!!activePomodoro}
-                        className={cn(
-                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-                          mode === 'work' 
-                            ? "bg-primary text-primary-foreground shadow-lg hover:bg-primary/90" 
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        🎯 Foco
-                      </Button>
-                      <Button
-                        variant={mode === 'shortBreak' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => handleSwitchMode('shortBreak')}
-                        disabled={!!activePomodoro}
-                        className={cn(
-                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-                          mode === 'shortBreak' 
-                            ? "bg-emerald-500 text-white shadow-lg hover:bg-emerald-600" 
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        ☕ Pausa
-                      </Button>
-                      <Button
-                        variant={mode === 'longBreak' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => handleSwitchMode('longBreak')}
-                        disabled={!!activePomodoro}
-                        className={cn(
-                          "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-                          mode === 'longBreak' 
-                            ? "bg-purple-500 text-white shadow-lg hover:bg-purple-600" 
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        🌟 Descanso
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            {/* Task Selector - Centralizado abaixo do timer */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="w-full"
-            >
-              <TaskSelector 
-                currentMode={mode}
-                settings={settings}
-              />
-            </motion.div>
-          </div>
         </div>
       </div>
 
-      {/* Modal de Configurações */}
+      {/* Settings Modal */}
       <PomodoroSettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
