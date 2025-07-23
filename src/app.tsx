@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import StatsPage from "./pages/StatsPage";
 import PomodoroPage from "./pages/PomodoroPage";
 import BoardsPage from "./pages/BoardsPage";
 import Board from "./pages/Board";
@@ -35,6 +36,7 @@ const App = () => (
             {/* Rotas autenticadas */}
             <Route element={<AuthenticatedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/stats" element={<StatsPage />} />
               <Route path="/pomodoro" element={<PomodoroPage />} />
               <Route path="/boards" element={<BoardsPage />} />
               <Route path="/board/:boardId" element={<Board />} />
