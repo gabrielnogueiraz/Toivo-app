@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Play, Pause, RotateCcw, Settings } from 'lucide-react';
+import { Sparkles, Play, Pause, RotateCcw, Settings, Flower2, Sprout } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 
@@ -366,7 +366,10 @@ export const MagicalFlowerGrowth = ({
             animate={{ opacity: [0.8, 1, 0.8] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            🌱 Jardim Virtual
+            <div className="flex items-center justify-center gap-2">
+              <Flower2 className="w-5 h-5 text-primary" />
+              <span>Jardim Virtual</span>
+            </div>
           </motion.h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Cultive sua produtividade
@@ -595,7 +598,10 @@ export const MagicalFlowerGrowth = ({
             animate={{ opacity: [0.6, 1, 0.6] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            💫 Vaso esperando para crescer...
+            <div className="flex items-center justify-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              <span>Vaso esperando para crescer...</span>
+            </div>
           </motion.p>
         )}
         {!isPotEmpty && !isFullyGrown && (
@@ -608,7 +614,10 @@ export const MagicalFlowerGrowth = ({
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            🌱 Sua flor está crescendo com amor...
+            <div className="flex items-center justify-center gap-2">
+              <Sprout className="w-4 h-4" />
+              <span>Sua flor está crescendo com amor...</span>
+            </div>
           </motion.p>
         )}
         {isFullyGrown && (
@@ -625,7 +634,11 @@ export const MagicalFlowerGrowth = ({
             }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            🎉 Flor completamente crescida! Parabéns! 🎉
+            <div className="flex items-center justify-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              <span>Flor completamente crescida! Parabéns!</span>
+              <Sparkles className="w-4 h-4" />
+            </div>
           </motion.p>
         )}
       </div>

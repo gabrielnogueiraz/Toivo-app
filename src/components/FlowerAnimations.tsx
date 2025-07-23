@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { Sprout, Flower2, Crown, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FlowerCreationAnimationProps {
   isVisible: boolean;
@@ -63,9 +65,25 @@ export const FlowerCreationAnimation = ({
             animate={{ scale: 1, opacity: 1 }}
             className="text-8xl mb-4"
           >
-            {stage === 'seed' && '🌱'}
-            {stage === 'growing' && '🌿'}
-            {stage === 'blooming' && (hasLegendary ? '🌹' : '🌸')}
+            {stage === 'seed' && (
+              <Sprout className="w-6 h-6 text-primary" />
+            )}
+            {stage === 'growing' && (
+              <Sprout className="w-6 h-6 text-primary scale-y-150" />
+            )}
+            {stage === 'blooming' && (
+              <div className="relative">
+                <Flower2 
+                  className={cn(
+                    "w-6 h-6",
+                    hasLegendary ? "text-amber-500" : "text-primary"
+                  )}
+                />
+                {hasLegendary && (
+                  <Crown className="w-3 h-3 text-amber-500 absolute -top-1 -right-1" />
+                )}
+              </div>
+            )}
             {stage === 'celebrating' && (
               <motion.div
                 animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
@@ -122,7 +140,21 @@ export const FlowerCreationAnimation = ({
           {stage === 'blooming' && (
             <div>
               <h3 className="text-xl font-bold text-card-foreground mb-2">
-                {hasLegendary ? '🎉 Flor Lendária Desbloqueada! 🎉' : '🌸 Nova Flor Criada! 🌸'}
+                <div className="flex items-center gap-2">
+                  {hasLegendary ? (
+                    <>
+                      <Crown className="w-4 h-4 text-amber-500" />
+                      <span>Flor Lendária Desbloqueada!</span>
+                      <Crown className="w-4 h-4 text-amber-500" />
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span>Nova Flor Criada!</span>
+                      <Sparkles className="w-4 h-4" />
+                    </>
+                  )}
+                </div>
               </h3>
               <p className="text-muted-foreground">
                 {flowerCount === 1 
@@ -205,7 +237,13 @@ export const LegendaryFlowerCelebration = ({
                 }}
                 className="absolute top-1/2 left-1/2 text-3xl"
               >
-                {i % 3 === 0 ? '✨' : i % 3 === 1 ? '🎆' : '💫'}
+                {i % 3 === 0 ? (
+                  <Sparkles className="w-4 h-4" />
+                ) : i % 3 === 1 ? (
+                  <Sparkles className="w-4 h-4 rotate-45" />
+                ) : (
+                  <Sparkles className="w-4 h-4 -rotate-45" />
+                )}
               </motion.div>
             ))}
           </div>

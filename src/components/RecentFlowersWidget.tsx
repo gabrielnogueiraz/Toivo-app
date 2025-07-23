@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Crown } from 'lucide-react';
+import { ArrowRight, Crown, Flower2 } from 'lucide-react';
 import { Flower, FLOWER_COLORS } from '../types/garden';
 import { useGardenStore } from '../stores/gardenStore';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { cn } from '@/lib/utils';
+import { Sprout } from 'lucide-react';
 
 export const RecentFlowersWidget = () => {
   const { flowers, fetchFlowers } = useGardenStore();
@@ -29,12 +31,13 @@ export const RecentFlowersWidget = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            🌸 Jardim Virtual
+            <Flower2 className="w-5 h-5 text-primary" />
+            Jardim Virtual
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-6">
-            <div className="text-4xl mb-2">🌱</div>
+            <Sprout className="w-12 h-12 mx-auto mb-2 text-primary" />
             <p className="text-gray-600 mb-4">
               Complete suas primeiras tarefas para ver flores florescerem!
             </p>
@@ -53,84 +56,41 @@ export const RecentFlowersWidget = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between text-lg">
-          <span className="flex items-center gap-2">
-            🌸 Jardim Virtual
-          </span>
-          <Link to="/garden">
-            <Button variant="ghost" size="sm">
-              Ver tudo
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Flower2 className="w-5 h-5 text-primary" />
+          Jardim Virtual
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {recentFlowers.map((flower, index) => {
+        <div className="space-y-4">
+          {recentFlowers.map((flower) => {
             const isLegendary = flower.type === 'legendary';
-            const flowerColor = FLOWER_COLORS[flower.priority];
-            
             return (
-              <motion.div
+              <div
                 key={flower.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
               >
-                <div
-                  className={`
-                    w-10 h-10 rounded-full flex items-center justify-center text-lg relative
-                    ${isLegendary ? 'bg-gradient-to-br from-amber-200 to-yellow-200' : 'bg-gray-100'}
-                  `}
-                  style={{
-                    backgroundColor: isLegendary ? undefined : `${flowerColor}20`,
-                    border: `2px solid ${flowerColor}`
-                  }}
-                >
-                  {isLegendary ? '🌹' : '🌸'}
+                <div className="relative">
+                  <Flower2 
+                    className={cn(
+                      "w-6 h-6",
+                      isLegendary ? "text-amber-500" : "text-primary"
+                    )}
+                  />
                   {isLegendary && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
-                      <Crown className="w-2 h-2 text-white" />
-                    </div>
+                    <Crown className="w-3 h-3 text-amber-500 absolute -top-1 -right-1" />
                   )}
                 </div>
-                
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">
-                    {flower.name}
+                  <p className="font-medium truncate">{flower.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {new Date(flower.createdAt).toLocaleDateString('pt-BR')}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge
-                      variant="outline"
-                      className="text-xs"
-                      style={{ borderColor: flowerColor, color: flowerColor }}
-                    >
-                      {flower.priority.toLowerCase()}
-                    </Badge>
-                    {isLegendary && (
-                      <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-800">
-                        Lendária
-                      </Badge>
-                    )}
-                  </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
-        
-        {flowers.length > 3 && (
-          <div className="mt-4 pt-3 border-t">
-            <Link to="/garden">
-              <Button variant="outline" size="sm" className="w-full">
-                Ver todas as {flowers.length} flores
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

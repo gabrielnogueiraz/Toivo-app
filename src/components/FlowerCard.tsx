@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
-import { Calendar, Crown, Tag } from 'lucide-react';
+import { Calendar, Crown, Tag, Flower2 } from 'lucide-react';
 import { Flower, FLOWER_COLORS } from '../types/garden';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 interface FlowerCardProps {
   flower: Flower;
@@ -60,7 +61,7 @@ export const FlowerCard = ({ flower, onClick, delay = 0 }: FlowerCardProps) => {
             whileHover={{ rotate: [0, -5, 5, 0] }}
             transition={{ duration: 0.5 }}
             className={`
-              w-16 h-16 rounded-full flex items-center justify-center text-3xl
+              w-16 h-16 rounded-full flex items-center justify-center
               ${isLegendary ? 'bg-gradient-to-br from-amber-200 to-yellow-200' : 'bg-muted'}
             `}
             style={{ 
@@ -68,13 +69,12 @@ export const FlowerCard = ({ flower, onClick, delay = 0 }: FlowerCardProps) => {
               border: `3px solid ${flowerColor}`
             }}
           >
-            <span 
-              style={{ 
-                filter: isLegendary ? 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.5))' : 'none'
-              }}
-            >
-              {isLegendary ? '🌹' : '🌸'}
-            </span>
+            <Flower2 
+              className={cn(
+                "w-8 h-8 transition-all duration-300",
+                isLegendary ? "text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "text-foreground"
+              )}
+            />
           </motion.div>
         </div>
 

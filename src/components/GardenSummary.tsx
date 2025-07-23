@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Crown, TrendingUp, Calendar, Star } from 'lucide-react';
+import { Crown, TrendingUp, Calendar, Star, Sprout, Flower2 } from 'lucide-react';
 import { useGardenStore } from '../stores/gardenStore';
 import { Badge } from './ui/badge';
 
@@ -30,10 +30,10 @@ export const GardenSummary = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg"
       >
-        <span className="text-lg">🌱</span>
-        <span className="text-sm text-blue-700">
-          Seu jardim está aguardando a primeira flor!
-        </span>
+        <div className="flex items-center gap-2">
+          <Sprout className="w-5 h-5 text-primary" />
+          <span>Iniciante</span>
+        </div>
       </motion.div>
     );
   }
@@ -44,7 +44,10 @@ export const GardenSummary = () => {
       animate={{ opacity: 1, y: 0 }}
       className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg"
     >
-      <span className="text-lg">🌸</span>
+      <div className="flex items-center gap-2">
+        <Flower2 className="w-5 h-5 text-primary" />
+        <span>Avançado</span>
+      </div>
       
       <div className="flex items-center gap-3 text-sm">
         {/* Total de flores */}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Clock, Target, ChevronDown, Kanban, FileText, Timer, AlertTriangle, Zap, Circle } from 'lucide-react';
+import { Search, Filter, Clock, Target, ChevronDown, Kanban, FileText, Timer, AlertTriangle, Zap, Circle, Flame, Sprout } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -163,9 +163,24 @@ export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: T
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ALL">Todas as prioridades</SelectItem>
-                    <SelectItem value="HIGH">🔥 Alta</SelectItem>
-                    <SelectItem value="MEDIUM">⚡ Média</SelectItem>
-                    <SelectItem value="LOW">🌱 Baixa</SelectItem>
+                    <SelectItem value="HIGH">
+                      <div className="flex items-center gap-2">
+                        <Flame className="w-4 h-4 text-red-500" />
+                        Alta
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="MEDIUM">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-yellow-500" />
+                        Média
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="LOW">
+                      <div className="flex items-center gap-2">
+                        <Sprout className="w-4 h-4 text-green-500" />
+                        Baixa
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

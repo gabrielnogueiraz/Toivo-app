@@ -1,4 +1,5 @@
 import logo from '@/assets/logo.png';
+import { Heart } from 'lucide-react';
 
 const Footer = () => {
   // const footerLinks = {
@@ -130,7 +131,10 @@ const Footer = () => {
             © 2025 Toivo. Todos os direitos reservados.
           </div>
           <div className="flex items-center space-x-6 text-sm text-slate-400">
-            <span>🌱 Feito com amor</span>
+            <span className="flex items-center gap-1">
+              <Heart className="w-4 h-4 text-primary" />
+              Feito com amor
+            </span>
             {/* <div className="flex items-center space-x-1">
               <span>Status:</span>
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Crown, Star, Target, TrendingUp, Calendar } from 'lucide-react';
+import { Crown, Star, Target, TrendingUp, Calendar, Flame, Zap, Sprout, Flower2 } from 'lucide-react';
 import { FlowerStats, FLOWER_COLORS } from '../types/garden';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -13,9 +13,9 @@ export const FlowerStatsComponent = ({ stats }: FlowerStatsProps) => {
   const legendaryPercentage = totalFlowers > 0 ? (stats.legendaryFlowers / totalFlowers) * 100 : 0;
   
   const priorityStats = [
-    { priority: 'HIGH', count: stats.flowersByPriority?.HIGH || 0, color: FLOWER_COLORS.HIGH, emoji: '🔥' },
-    { priority: 'MEDIUM', count: stats.flowersByPriority?.MEDIUM || 0, color: FLOWER_COLORS.MEDIUM, emoji: '⚡' },
-    { priority: 'LOW', count: stats.flowersByPriority?.LOW || 0, color: FLOWER_COLORS.LOW, emoji: '🌱' },
+    { priority: 'HIGH', count: stats.flowersByPriority?.HIGH || 0, color: FLOWER_COLORS.HIGH, icon: Flame },
+    { priority: 'MEDIUM', count: stats.flowersByPriority?.MEDIUM || 0, color: FLOWER_COLORS.MEDIUM, icon: Zap },
+    { priority: 'LOW', count: stats.flowersByPriority?.LOW || 0, color: FLOWER_COLORS.LOW, icon: Sprout },
   ];
 
   return (
@@ -84,7 +84,7 @@ export const FlowerStatsComponent = ({ stats }: FlowerStatsProps) => {
                   transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
                   className="flex items-center gap-3"
                 >
-                  <span className="text-lg">{item.emoji}</span>
+                  <item.icon className="w-5 h-5" style={{ color: item.color }} />
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm font-medium text-card-foreground">
@@ -148,13 +148,20 @@ export const FlowerStatsComponent = ({ stats }: FlowerStatsProps) => {
                 <div className="pt-2 border-t border-muted">
                   <div className="flex items-center gap-2">
                     <div
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
+                      className="w-6 h-6 rounded-full flex items-center justify-center"
                       style={{ 
                         backgroundColor: `${FLOWER_COLORS[stats.favoriteFlower.priority]}20`,
                         border: `1px solid ${FLOWER_COLORS[stats.favoriteFlower.priority]}`
                       }}
                     >
-                      {stats.favoriteFlower.type === 'legendary' ? '🌹' : '🌸'}
+                      {stats.favoriteFlower.type === 'legendary' ? (
+                        <div className="relative">
+                          <Flower2 className="w-4 h-4 text-amber-500" />
+                          <Crown className="w-2 h-2 text-amber-500 absolute -top-0.5 -right-0.5" />
+                        </div>
+                      ) : (
+                        <Flower2 className="w-4 h-4 text-foreground" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-card-foreground truncate">

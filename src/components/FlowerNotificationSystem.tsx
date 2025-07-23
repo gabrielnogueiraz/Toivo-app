@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, X } from 'lucide-react';
+import { Crown, X, Flower2, Sparkles } from 'lucide-react';
 import { Flower, FLOWER_COLORS } from '../types/garden';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import useGardenRealtime from '../hooks/useGardenRealtime';
 import { useGardenStore } from '../stores/gardenStore';
+import { cn } from '@/lib/utils';
 
 interface FlowerNotification {
   id: string;
@@ -102,33 +103,25 @@ export const FlowerNotificationSystem = () => {
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2, type: 'spring' }}
                     className={`
-                      w-12 h-12 rounded-full flex items-center justify-center text-2xl relative
-                      ${isLegendary ? 'bg-gradient-to-br from-amber-200 to-yellow-200' : 'bg-white'}
+                      w-10 h-10 rounded-full flex items-center justify-center
+                      ${isLegendary ? 'bg-gradient-to-br from-amber-200 to-yellow-200' : 'bg-muted'}
                     `}
-                    style={{
+                    style={{ 
                       backgroundColor: isLegendary ? undefined : `${flowerColor}20`,
                       border: `2px solid ${flowerColor}`
                     }}
                   >
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.3, type: 'spring', bounce: 0.6 }}
-                    >
-                      {isLegendary ? '🌹' : '🌸'}
-                    </motion.span>
-                    
-                    {/* Ícone lendário */}
-                    {isLegendary && (
-                      <motion.div
-                        initial={{ scale: 0, rotate: -180 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ delay: 0.4, type: 'spring' }}
-                        className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center"
-                      >
-                        <Crown className="w-3 h-3 text-white" />
-                      </motion.div>
-                    )}
+                    <div className="relative">
+                      <Flower2 
+                        className={cn(
+                          "w-6 h-6",
+                          isLegendary ? "text-amber-500" : "text-primary"
+                        )}
+                      />
+                      {isLegendary && (
+                        <Crown className="w-3 h-3 text-amber-500 absolute -top-1 -right-1" />
+                      )}
+                    </div>
                   </motion.div>
 
                   {/* Texto */}
@@ -139,7 +132,17 @@ export const FlowerNotificationSystem = () => {
                       transition={{ delay: 0.2 }}
                       className="font-semibold text-gray-900 text-sm"
                     >
-                      {isLegendary ? '🎉 Flor Lendária!' : '✨ Nova Flor!'}
+                      {isLegendary ? (
+                        <>
+                          <Crown className="w-4 h-4 text-amber-500" />
+                          <span>Flor Lendária!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4" />
+                          <span>Nova Flor!</span>
+                        </>
+                      )}
                     </motion.h4>
                     
                     <motion.p

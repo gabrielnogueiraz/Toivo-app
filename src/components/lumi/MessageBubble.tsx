@@ -12,7 +12,7 @@ interface MessageBubbleProps {
 
 // Função para limpar e formatar texto da Lumi
 const formatLumiContent = (content: string) => {
-  // Remove emojis problemáticos que não renderizam bem
+  // Remover emojis problemáticos que não renderizam bem
   let cleanContent = content.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
   
   // Converter formatação especial para markdown
@@ -21,8 +21,8 @@ const formatLumiContent = (content: string) => {
     .replace(/^(\d+\.)\s*(.+)$/gm, '$1 $2')
     // Converter marcadores para markdown
     .replace(/^[•\-\*]\s*(.+)$/gm, '- $1')
-    // Converter seções com emojis para headers
-    .replace(/^([🔴🟡🟢⚡📋📊🎯✨]+)\s*(.+)$/gm, '### $2')
+    // Converter seções para headers
+    .replace(/^(Seção|Parte|Etapa|Passo)\s*(\d+)?:?\s*(.+)$/gm, '### $3')
     // Melhorar quebras de linha
     .replace(/\n\s*\n/g, '\n\n');
   

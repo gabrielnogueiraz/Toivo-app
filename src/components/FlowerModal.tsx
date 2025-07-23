@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Edit2, Tag, Trash2, Crown, Calendar, Target } from 'lucide-react';
+import { X, Edit2, Tag, Trash2, Crown, Calendar, Target, Flower2 } from 'lucide-react';
 import { Flower, FLOWER_COLORS } from '../types/garden';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useGardenStore } from '../stores/gardenStore';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 interface FlowerModalProps {
   flower: Flower | null;
@@ -120,7 +121,7 @@ export const FlowerModal = ({ flower, isOpen, onClose }: FlowerModalProps) => {
                     whileHover={{ rotate: [0, -10, 10, 0] }}
                     transition={{ duration: 0.5 }}
                     className={`
-                      w-12 h-12 rounded-full flex items-center justify-center text-2xl
+                      w-12 h-12 rounded-full flex items-center justify-center
                       ${isLegendary ? 'bg-gradient-to-br from-amber-200 to-yellow-200' : 'bg-muted'}
                     `}
                     style={{ 
@@ -128,7 +129,17 @@ export const FlowerModal = ({ flower, isOpen, onClose }: FlowerModalProps) => {
                       border: `2px solid ${flowerColor}`
                     }}
                   >
-                    {isLegendary ? '🌹' : '🌸'}
+                    <div className="relative">
+                      <Flower2 
+                        className={cn(
+                          "w-6 h-6 transition-all duration-300",
+                          isLegendary ? "text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "text-foreground"
+                        )}
+                      />
+                      {isLegendary && (
+                        <Crown className="w-3 h-3 text-amber-500 absolute -top-1 -right-1" />
+                      )}
+                    </div>
                   </motion.div>
                   
                   {isLegendary && (
@@ -186,7 +197,7 @@ export const FlowerModal = ({ flower, isOpen, onClose }: FlowerModalProps) => {
                 </div>
                 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>📅</span>
+                  <Calendar className="w-4 h-4" />
                   <span>{format(new Date(flower.createdAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</span>
                 </div>
 

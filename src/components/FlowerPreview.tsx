@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { Crown, Target } from 'lucide-react';
+import { Crown, Flower2, Sparkles } from 'lucide-react';
 import { Priority, FLOWER_COLORS } from '../types/garden';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
+import { cn } from '@/lib/utils';
 
 interface FlowerPreviewProps {
   taskPriority: Priority;
@@ -26,7 +27,15 @@ export const FlowerPreview = ({
     <Card className="relative overflow-hidden">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2">
-          <Target className="w-4 h-4" />
+          <Flower2 
+            className={cn(
+              "w-8 h-8",
+              isHighPriority ? "text-amber-500" : "text-primary"
+            )}
+          />
+          {isHighPriority && (
+            <Crown className="w-4 h-4 text-amber-500 absolute -top-1 -right-1" />
+          )}
           Recompensa da Tarefa
         </CardTitle>
       </CardHeader>
@@ -138,7 +147,11 @@ export const FlowerPreview = ({
               transition={{ delay: 0.2 }}
               className="text-xs text-green-600 mt-3 font-medium"
             >
-              ✨ Parabéns! Sua flor foi adicionada ao jardim!
+              <div className="flex items-center gap-2 text-center">
+                <Sparkles className="w-4 h-4" />
+                <span>Parabéns! Sua flor foi adicionada ao jardim!</span>
+                <Sparkles className="w-4 h-4" />
+              </div>
             </motion.p>
           )}
         </div>

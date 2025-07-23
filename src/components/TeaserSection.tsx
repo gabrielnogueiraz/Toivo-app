@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import teaserVideo from '@/assets/teaser.mp4';
+import { Sparkles, Sprout } from 'lucide-react';
 
 const TeaserSection = () => {
   return (
@@ -67,24 +68,14 @@ const TeaserSection = () => {
 
             {/* Features preview */}
             <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center space-x-3 p-3 glass-effect rounded-lg hover-glow">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs sm:text-sm">🌱</span>
-                </div>
-                <div>
-                  <div className="font-medium text-white text-sm sm:text-base">Crescimento visual</div>
-                  <div className="text-xs sm:text-sm text-slate-400">Veja seu progresso florescer</div>
-                </div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                <span>Transforme sua produtividade</span>
               </div>
               
-              <div className="flex items-center space-x-3 p-3 glass-effect rounded-lg hover-glow">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs sm:text-sm">🤖</span>
-                </div>
-                <div>
-                  <div className="font-medium text-white text-sm sm:text-base">Lumi, sua IA</div>
-                  <div className="text-xs sm:text-sm text-slate-400">Assistente inteligente e carismática</div>
-                </div>
+              <div className="flex items-center gap-2">
+                <Sprout className="w-4 h-4 text-white" />
+                <span>Cultive seu sucesso</span>
               </div>
             </div>
           </div>

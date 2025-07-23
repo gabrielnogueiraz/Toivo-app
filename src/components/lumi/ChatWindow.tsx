@@ -11,10 +11,10 @@ import { cn } from '@/lib/utils';
 import { getTimeBasedGreeting } from '@/utils/lumiGreetings';
 import { 
   RefreshCw, 
-  Trash2, 
-  Sparkles,
+  Trash2,
   AlertCircle 
 } from 'lucide-react';
+import lumiLogo from '@/assets/LumiLogo.png';
 
 interface ChatWindowProps {
   className?: string;
@@ -71,8 +71,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
       {/* Header */}
       <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-background/80 backdrop-blur-sm">
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center shadow-sm">
-            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10">
+            <img src={lumiLogo} alt="Lumi" className="w-full h-full" />
           </div>
           <div>
             <h1 className="text-base sm:text-lg font-semibold">Lumi</h1>
@@ -111,8 +111,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
           /* Welcome Screen with Floating Input */
           <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
             {/* Avatar */}
-            <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center mb-6 sm:mb-8 shadow-lg">
-              <Sparkles className="h-8 sm:h-10 w-8 sm:w-10 text-white" />
+            <div className="w-16 sm:w-20 h-16 sm:h-20 mb-6 sm:mb-8">
+              <img src={lumiLogo} alt="Lumi" className="w-full h-full" />
             </div>
             
             {/* Greeting */}
