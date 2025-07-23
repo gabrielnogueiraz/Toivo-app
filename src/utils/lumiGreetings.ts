@@ -1,54 +1,30 @@
 // Frases de abertura variadas para a Lumi
-export const lumiGreetings = [
+export const LUMI_GREETINGS = [
   {
-    title: "Olá, {name}! Como você está hoje? ✨",
-    description: "Estou aqui para ajudar você a ser mais produtivo e organizado."
+    title: "Olá, {name}! Como você está hoje?",
+    subtitle: "Estou aqui para te ajudar a ter um dia mais produtivo."
   },
   {
-    title: "Oi, {name}! Pronto para um dia incrível? 🚀",
-    description: "Vamos juntos transformar suas ideias em conquistas reais."
+    title: "Bem-vindo de volta, {name}!",
+    subtitle: "Pronto para mais um dia de conquistas?"
   },
   {
-    title: "E aí, {name}! Tudo bem? 💫",
-    description: "Como posso contribuir com sua produtividade hoje?"
+    title: "Oi, {name}! Como posso te ajudar hoje?",
+    subtitle: "Estou aqui para tornar seu dia mais produtivo."
   },
   {
-    title: "Olá, {name}! Por onde vamos começar? 🌟",
-    description: "Estou aqui para organizar suas tarefas e potencializar seus resultados."
-  },
-  {
-    title: "Oi, {name}! Como posso te ajudar hoje? ⚡",
-    description: "Vamos criar um fluxo de trabalho que realmente funciona para você."
-  },
-  {
-    title: "E aí, {name}! Preparado para mais um dia produtivo? ✨",
-    description: "Juntos podemos transformar metas em conquistas concretas."
-  },
-  {
-    title: "Olá, {name}! Que bom te ver por aqui! 📈",
-    description: "Como posso ajudar você a alcançar seus objetivos hoje?"
-  },
-  {
-    title: "Oi, {name}! Vamos fazer acontecer? 🎯",
-    description: "Estou pronta para ser sua parceira na jornada do sucesso."
-  },
-  {
-    title: "E aí, {name}! Como está se sentindo hoje? 🆙",
-    description: "Vamos organizar, priorizar e executar com excelência?"
-  },
-  {
-    title: "Olá, {name}! Qual é o plano para hoje? 💡",
-    description: "Estou aqui para ajudar você a descobrir seu potencial máximo."
+    title: "E aí, {name}! Preparado para mais um dia produtivo?",
+    subtitle: "Vamos juntos alcançar seus objetivos."
   }
 ];
 
 // Função para obter uma saudação aleatória
 export const getRandomGreeting = (userName: string = 'usuário') => {
-  const randomIndex = Math.floor(Math.random() * lumiGreetings.length);
-  const greeting = lumiGreetings[randomIndex];
+  const randomIndex = Math.floor(Math.random() * LUMI_GREETINGS.length);
+  const greeting = LUMI_GREETINGS[randomIndex];
   return {
     title: greeting.title.replace('{name}', userName),
-    description: greeting.description
+    description: greeting.subtitle
   };
 };
 
@@ -58,27 +34,27 @@ export const getTimeBasedGreeting = (userName: string = 'usuário') => {
   
   if (hour >= 5 && hour < 12) {
     // Manhã - saudações mais energéticas
-    const morningGreetings = lumiGreetings.filter((_, index) => [1, 4, 6, 9].includes(index));
+    const morningGreetings = LUMI_GREETINGS.filter((_, index) => [1, 4, 6, 9].includes(index));
     const greeting = morningGreetings[Math.floor(Math.random() * morningGreetings.length)];
     return {
       title: greeting.title.replace('{name}', userName),
-      description: greeting.description
+      description: greeting.subtitle
     };
   } else if (hour >= 12 && hour < 18) {
     // Tarde - saudações focadas em produtividade
-    const afternoonGreetings = lumiGreetings.filter((_, index) => [3, 6, 7].includes(index));
+    const afternoonGreetings = LUMI_GREETINGS.filter((_, index) => [3, 6, 7].includes(index));
     const greeting = afternoonGreetings[Math.floor(Math.random() * afternoonGreetings.length)];
     return {
       title: greeting.title.replace('{name}', userName),
-      description: greeting.description
+      description: greeting.subtitle
     };
   } else {
     // Noite - saudações mais suaves
-    const eveningGreetings = lumiGreetings.filter((_, index) => [0, 2, 5, 8].includes(index));
+    const eveningGreetings = LUMI_GREETINGS.filter((_, index) => [0, 2, 5, 8].includes(index));
     const greeting = eveningGreetings[Math.floor(Math.random() * eveningGreetings.length)];
     return {
       title: greeting.title.replace('{name}', userName),
-      description: greeting.description
+      description: greeting.subtitle
     };
   }
 };
