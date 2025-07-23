@@ -77,3 +77,21 @@ export const getTaskFlowerIndicator = (
   
   return indicators[state];
 };
+
+export const FLOWER_STAGES = {
+  LOW: {
+    name: 'Broto',
+    icon: 'Sprout',
+    color: '#A3BE8C'
+  },
+  MEDIUM: {
+    name: 'Flor',
+    icon: 'Flower2',
+    color: '#EBCB8B'
+  },
+  HIGH: {
+    name: 'Flor Rara',
+    icon: 'Flower2Crown',
+    color: '#BF616A'
+  }
+};
