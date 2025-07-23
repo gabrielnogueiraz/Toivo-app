@@ -5,13 +5,11 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import SystemNavbar from '@/components/SystemNavbar';
 import { FlowerNotificationSystem } from '@/components/FlowerNotificationSystem';
 import { NotificationContainer } from '@/components/NotificationContainer';
-import { LegendaryFlowerCelebration } from '@/components/LegendaryFlowerCelebration';
-import { useCelebrationStore } from '@/stores/celebrationStore';
+import { FlowerCelebrationSystem } from '@/components/LegendaryFlowerCelebration';
 
 export default function AuthenticatedLayout() {
   const { isAuthenticated, loading, user } = useAuth();
   const isMobile = useIsMobile();
-  const { activeCelebration, dismissCelebration } = useCelebrationStore();
 
   // Aguarda carregamento da autenticação
   if (loading) {
@@ -43,15 +41,8 @@ export default function AuthenticatedLayout() {
       {/* Sistema de notificações gerais */}
       <NotificationContainer />
       
-      {/* Celebração de flores lendárias */}
-      {activeCelebration?.type === 'legendary_flower' && (
-        <LegendaryFlowerCelebration
-          isVisible={activeCelebration.isVisible}
-          onComplete={dismissCelebration}
-          flowerName={activeCelebration.flowerName}
-          flowerCount={activeCelebration.flowerCount}
-        />
-      )}
+      {/* Sistema de celebração de flores (global) */}
+      <FlowerCelebrationSystem />
     </div>
   );
 }
