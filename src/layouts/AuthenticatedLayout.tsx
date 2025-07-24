@@ -3,9 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import SystemNavbar from '@/components/SystemNavbar';
-import { FlowerNotificationSystem } from '@/components/FlowerNotificationSystem';
 import { NotificationContainer } from '@/components/NotificationContainer';
-import { FlowerCelebrationSystem } from '@/components/LegendaryFlowerCelebration';
 
 export default function AuthenticatedLayout() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -35,14 +33,8 @@ export default function AuthenticatedLayout() {
         <Outlet />
       </main>
       
-      {/* Sistema de notificações de flores */}
-      <FlowerNotificationSystem />
-      
       {/* Sistema de notificações gerais */}
       <NotificationContainer />
-      
-      {/* Sistema de celebração de flores (global) */}
-      <FlowerCelebrationSystem />
     </div>
   );
 }
