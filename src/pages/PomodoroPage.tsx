@@ -5,7 +5,8 @@ import {
   Pause, 
   Square, 
   Timer, 
-  Users,
+  Coffee,
+  Star,
   RotateCcw, 
   Settings,
   CheckCircle2,
@@ -157,7 +158,7 @@ export default function PomodoroPage() {
       case 'shortBreak':
         return {
           label: 'Pausa Curta',
-          icon: Users,
+          icon: Coffee,
           color: 'text-emerald-500',
           bgColor: 'bg-emerald-50 dark:bg-emerald-950/20',
           borderColor: 'border-emerald-200 dark:border-emerald-800'
@@ -165,7 +166,7 @@ export default function PomodoroPage() {
       case 'longBreak':
         return {
           label: 'Descanso Longo',
-          icon: Square,
+          icon: Star,
           color: 'text-purple-500',
           bgColor: 'bg-purple-50 dark:bg-purple-950/20',
           borderColor: 'border-purple-200 dark:border-purple-800'
@@ -368,8 +369,8 @@ export default function PomodoroPage() {
               <div className="inline-flex items-center bg-muted/50 backdrop-blur-sm p-1 rounded-2xl border border-border/50 shadow-lg">
                 {[
                   { mode: 'work', icon: Timer, label: 'Foco' },
-                  { mode: 'shortBreak', icon: Users, label: 'Pausa' },
-                  { mode: 'longBreak', icon: Square, label: 'Descanso' }
+                  { mode: 'shortBreak', icon: Coffee, label: 'Pausa' },
+                  { mode: 'longBreak', icon: Star, label: 'Descanso' }
                 ].map(({ mode: buttonMode, icon: Icon, label }) => (
                   <motion.div
                     key={buttonMode}

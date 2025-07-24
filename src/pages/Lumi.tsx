@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLumi } from '@/hooks/useLumi';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Send, Lock, Loader2 } from 'lucide-react';
@@ -116,6 +117,7 @@ const MinimalMessage = ({ message, index }: { message: any; index: number }) => 
 const MinimalInput = ({ onSendMessage, isLoading, isConnected }: any) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isMobile = useIsMobile();
 
   // Auto-resize textarea
   useEffect(() => {
@@ -147,9 +149,17 @@ const MinimalInput = ({ onSendMessage, isLoading, isConnected }: any) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="sticky bottom-0 bg-background/90 backdrop-blur-sm border-t border-border/20"
+      className={cn(
+        "sticky bg-background/95 backdrop-blur-sm border-t border-border/20",
+        isMobile 
+          ? "bottom-16 left-0 right-0 z-40 pb-safe" // Mobile: acima da bottom navbar
+          : "bottom-0 left-0 right-0 z-30" // Desktop: na parte inferior
+      )}
     >
-      <div className="max-w-4xl mx-auto p-4">
+      <div className={cn(
+        "max-w-4xl mx-auto",
+        isMobile ? "p-3" : "p-4"
+      )}>
         <form onSubmit={handleSubmit} className="relative">
           <div className="lumi-minimal-input">
             <textarea
@@ -161,7 +171,8 @@ const MinimalInput = ({ onSendMessage, isLoading, isConnected }: any) => {
               disabled={!isConnected}
               className={cn(
                 "lumi-minimal-textarea",
-                "w-full pl-4 pr-14 py-4 min-h-[48px] max-h-[120px]",
+                "w-full pr-14 min-h-[48px] max-h-[120px]",
+                isMobile ? "pl-4 py-3" : "pl-4 py-4",
                 !isConnected && "cursor-not-allowed opacity-50"
               )}
               rows={1}
@@ -194,6 +205,7 @@ const MinimalInput = ({ onSendMessage, isLoading, isConnected }: any) => {
 
 // Tela de boas-vindas minimalista
 const WelcomeScreen = ({ onSendMessage, isLoading, isConnected, user }: any) => {
+  const isMobile = useIsMobile();
   const suggestions = [
     "Como posso ser mais produtivo hoje?",
     "Qual é o meu progresso atual?",
@@ -205,15 +217,24 @@ const WelcomeScreen = ({ onSendMessage, isLoading, isConnected, user }: any) => 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="flex-1 flex flex-col items-center justify-center px-6 py-12"
+      className={cn(
+        "flex-1 flex flex-col items-center justify-center",
+        isMobile ? "px-4 py-8" : "px-6 py-12"
+      )}
     >
       {/* Saudação elegante */}
-      <div className="lumi-minimal-welcome mb-12 max-w-md">
+      <div className={cn(
+        "lumi-minimal-welcome mb-12",
+        isMobile ? "max-w-sm" : "max-w-md"
+      )}>
         <motion.h1 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-2xl font-medium text-foreground mb-3"
+          className={cn(
+            "font-medium text-foreground mb-3",
+            isMobile ? "text-xl" : "text-2xl"
+          )}
         >
           Olá, {user?.name?.split(' ')[0] || 'usuário'}
         </motion.h1>
@@ -232,7 +253,10 @@ const WelcomeScreen = ({ onSendMessage, isLoading, isConnected, user }: any) => 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="flex flex-col gap-3 w-full max-w-md"
+        className={cn(
+          "flex flex-col gap-3 w-full",
+          isMobile ? "max-w-sm" : "max-w-md"
+        )}
       >
         {suggestions.map((suggestion, index) => (
           <motion.button
@@ -244,7 +268,8 @@ const WelcomeScreen = ({ onSendMessage, isLoading, isConnected, user }: any) => 
             disabled={!isConnected || isLoading}
             className={cn(
               "lumi-minimal-suggestion",
-              "disabled:opacity-50 disabled:cursor-not-allowed"
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              isMobile && "touch-target text-sm"
             )}
           >
             {suggestion}
@@ -257,6 +282,7 @@ const WelcomeScreen = ({ onSendMessage, isLoading, isConnected, user }: any) => 
 
 const LumiContent: React.FC = () => {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const {
     messages,
     isLoading,
@@ -298,24 +324,37 @@ const LumiContent: React.FC = () => {
     return (
       <>
         <SystemNavbar />
-        <div className="h-[calc(100vh-4rem)] flex items-center justify-center bg-background">
+        <div className={cn(
+          "flex items-center justify-center bg-background",
+          isMobile 
+            ? "h-[calc(100vh-3.5rem-4rem)] pt-14" // Mobile: altura - header mobile - bottom nav
+            : "h-[calc(100vh-4rem)]" // Desktop: altura - navbar
+        )}>
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="lumi-minimal-welcome max-w-sm"
+            className={cn(
+              "lumi-minimal-welcome",
+              isMobile ? "max-w-xs px-4" : "max-w-sm"
+            )}
           >
             <div className="w-12 h-12 mx-auto rounded-full bg-muted flex items-center justify-center mb-6">
               <Lock className="w-5 h-5 text-muted-foreground" />
             </div>
             <div>
-              <h2 className="text-xl font-medium mb-2">Acesso Restrito</h2>
+              <h2 className={cn(
+                "font-medium mb-2",
+                isMobile ? "text-lg" : "text-xl"
+              )}>
+                Acesso Restrito
+              </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
                 Você precisa estar logado para conversar com a Lumi
               </p>
               <Button 
                 onClick={() => window.location.href = '/login'}
-                className="lumi-minimal-button active"
+                className="lumi-minimal-button active w-full"
               >
                 Fazer Login
               </Button>
@@ -329,16 +368,29 @@ const LumiContent: React.FC = () => {
   return (
     <>
       <SystemNavbar />
-      <div className="lumi-minimal-container h-[calc(100vh-4rem)] flex flex-col">
+      <div className={cn(
+        "lumi-minimal-container flex flex-col",
+        isMobile 
+          ? "h-[calc(100vh-3.5rem-4rem)] pt-14" // Mobile: altura total - header mobile - bottom nav + padding-top
+          : "h-[calc(100vh-4rem)]" // Desktop: altura total - navbar
+      )}>
         {/* Cabeçalho minimalista fixo */}
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="lumi-minimal-header flex items-center justify-between px-6 py-4"
+          className={cn(
+            "lumi-minimal-header flex items-center justify-between",
+            isMobile ? "px-4 py-3" : "px-6 py-4"
+          )}
         >
           <div>
-            <h1 className="text-lg font-medium text-foreground">Lumi</h1>
+            <h1 className={cn(
+              "font-medium text-foreground",
+              isMobile ? "text-base" : "text-lg"
+            )}>
+              Lumi
+            </h1>
             <div className="flex items-center gap-2">
               <div className={cn(
                 "lumi-connection-indicator",
@@ -358,7 +410,10 @@ const LumiContent: React.FC = () => {
                 clearMessages();
                 clearError();
               }}
-              className="lumi-minimal-button text-muted-foreground hover:text-foreground"
+              className={cn(
+                "lumi-minimal-button text-muted-foreground hover:text-foreground",
+                isMobile && "text-xs px-2"
+              )}
             >
               Nova conversa
             </Button>
@@ -375,7 +430,11 @@ const LumiContent: React.FC = () => {
               user={user}
             />
           ) : (
-            <div className="flex-1 overflow-y-auto lumi-scrollbar px-6 py-6">
+            <div className={cn(
+              "flex-1 overflow-y-auto lumi-scrollbar",
+              isMobile ? "px-4 py-4" : "px-6 py-6",
+              isMobile && "pb-20" // Espaço extra para input mobile
+            )}>
               <div className="lumi-message-layout">
                 <AnimatePresence>
                   {messages.map((message, index) => (

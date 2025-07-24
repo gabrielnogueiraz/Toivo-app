@@ -822,3 +822,54 @@ All colors MUST be HSL.
 .lumi-connection-indicator.loading {
   @apply bg-yellow-500/60 lumi-pulse-gentle;
 }
+
+/* Responsividade aprimorada para mobile */
+.touch-target {
+  @apply min-h-[44px] min-w-[44px];
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-padding-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Ajustes específicos para a Lumi em mobile */
+@media (max-width: 768px) {
+  .lumi-minimal-container {
+    @apply overflow-hidden;
+  }
+  
+  .lumi-minimal-input {
+    @apply shadow-lg border-2;
+  }
+  
+  .lumi-minimal-textarea {
+    @apply text-base; /* Evita zoom automático no iOS */
+  }
+  
+  .lumi-message-layout {
+    @apply space-y-3;
+  }
+  
+  .lumi-minimal-message {
+    @apply text-sm leading-relaxed;
+  }
+  
+  .lumi-minimal-suggestion {
+    @apply p-4 text-sm border-2;
+  }
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-width: 375px) {
+  .lumi-minimal-header {
+    @apply px-3 py-2;
+  }
+  
+  .lumi-minimal-welcome h1 {
+    @apply text-lg;
+  }
+}
