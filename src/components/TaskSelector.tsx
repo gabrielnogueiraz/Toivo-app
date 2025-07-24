@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Clock, Target, ChevronDown, Kanban, FileText, Timer, AlertTriangle, Zap, Circle, Flame, Sprout } from 'lucide-react';
+import { Search, Filter, Clock, Target, ChevronDown, Kanban, FileText, Timer, AlertTriangle, Zap, Circle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,7 @@ import { usePomodoroTasks, useStartPomodoro } from '@/hooks';
 import { PomodoroTasksParams } from '@/services/pomodoroService';
 import { PomodoroTask } from '@/types/board';
 import { cn } from '@/lib/utils';
-import { TaskFlowerIndicator } from './TaskFlowerIndicator';
 import { CompleteTaskButton } from './CompleteTaskButton';
-import { TaskWithFlowerState } from '../types/taskFlower';
 
 interface TaskSelectorProps {
   onTaskSelect?: (task: PomodoroTask) => void;
@@ -167,7 +165,7 @@ export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: T
                     <SelectItem value="ALL">Todas as prioridades</SelectItem>
                     <SelectItem value="HIGH">
                       <div className="flex items-center gap-2">
-                        <Flame className="w-4 h-4 text-red-500" />
+                        <Circle className="w-4 h-4 text-red-500" />
                         Alta
                       </div>
                     </SelectItem>
@@ -179,7 +177,7 @@ export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: T
                     </SelectItem>
                     <SelectItem value="LOW">
                       <div className="flex items-center gap-2">
-                        <Sprout className="w-4 h-4 text-green-500" />
+                        <Circle className="w-4 h-4 text-green-500" />
                         Baixa
                       </div>
                     </SelectItem>
@@ -305,18 +303,6 @@ export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: T
                         <h4 className="font-semibold text-base line-clamp-2 flex-1 group-hover:text-primary transition-colors duration-200">
                           {task.title}
                         </h4>
-                        <TaskFlowerIndicator 
-                          task={{
-                            id: task.id,
-                            title: task.title,
-                            completed: task.completed || false,
-                            completedPomodoros: task.completedPomodoros || 0,
-                            pomodoroGoal: task.pomodoroGoal || 0,
-                            hasFlowers: task.hasFlowers,
-                            priority: task.priority
-                          } as TaskWithFlowerState}
-                          className="text-xs"
-                        />
                         <Badge 
                           variant="outline" 
                           className={cn(
@@ -364,15 +350,7 @@ export function TaskSelector({ onTaskSelect, currentMode = 'work', settings }: T
 
                     <div className="flex items-center gap-2">
                       <CompleteTaskButton 
-                        task={{
-                          id: task.id,
-                          title: task.title,
-                          completed: task.completed || false,
-                          completedPomodoros: task.completedPomodoros || 0,
-                          pomodoroGoal: task.pomodoroGoal || 0,
-                          hasFlowers: task.hasFlowers,
-                          priority: task.priority
-                        } as TaskWithFlowerState}
+                        task={task}
                       />
                       <Button
                         onClick={(e) => {

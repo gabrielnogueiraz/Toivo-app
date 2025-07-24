@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Square, Minimize2, Maximize2, X, Volume2, VolumeX, Flower2 } from 'lucide-react';
+import { Play, Pause, Square, Minimize2, Maximize2, X, Volume2, VolumeX, Timer } from 'lucide-react';
 import { useActivePomodoro, usePomodoroTimer, useStartPomodoro, usePausePomodoro, useResumePomodoro, useFinishPomodoro, useNotifications, usePomodoroSync } from '@/hooks';
 import { usePomodoroStore } from '@/stores';
-import { MagicalFlowerGrowth } from './MagicalFlowerGrowth';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -36,7 +35,6 @@ export function PomodoroTimer() {
   const { showPomodoroNotification } = useNotifications();
   
   const [prevTimeLeft, setPrevTimeLeft] = useState(timer.timeLeft);
-  const [viewMode, setViewMode] = useState<'timer' | 'flower'>('timer');
 
   useEffect(() => {
     if (activePomodoro) {
@@ -89,20 +87,6 @@ export function PomodoroTimer() {
 
   const toggleSound = () => {
     setEnableSounds(!enableSounds);
-  };
-
-  const toggleViewMode = () => {
-    setViewMode(viewMode === 'timer' ? 'flower' : 'timer');
-  };
-
-  // Obter prioridade da tarefa para determinar tipo de flor
-  const getTaskPriority = () => {
-    return activePomodoro?.task?.priority || 'MEDIUM';
-  };
-
-  // Verificar se é uma flor lendária (tarefas de alta prioridade têm chance)
-  const isLegendaryFlower = () => {
-    return activePomodoro?.task?.priority === 'HIGH' && Math.random() < 0.1; // 10% chance
   };
 
   if (!isVisible || !activePomodoro) {
@@ -161,9 +145,6 @@ export function PomodoroTimer() {
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold">Modo Foco</h2>
                       <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={toggleViewMode}>
-              <Flower2 className="w-4 h-4" />
-            </Button>
             <Button variant="ghost" size="sm" onClick={toggleSound}>
               {enableSounds ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </Button>
@@ -174,19 +155,7 @@ export function PomodoroTimer() {
           </div>
           
           <div className="mb-8">
-            {viewMode === 'timer' ? (
-              <CircularProgress />
-            ) : (
-              <div className="flex justify-center">
-                <MagicalFlowerGrowth
-                  progress={timer.progress * 100}
-                  isActive={timer.isActive}
-                  priority={getTaskPriority()}
-                  size="lg"
-                  isLegendary={isLegendaryFlower()}
-                />
-              </div>
-            )}
+            <CircularProgress />
           </div>
 
           {activePomodoro.task && (
@@ -287,9 +256,6 @@ export function PomodoroTimer() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold">Pomodoro Timer</h3>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={toggleViewMode}>
-              <Flower2 className="w-4 h-4" />
-            </Button>
             <Button variant="ghost" size="sm" onClick={toggleSound}>
               {enableSounds ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </Button>
@@ -305,24 +271,12 @@ export function PomodoroTimer() {
           </div>
         </div>
 
-        {viewMode === 'timer' ? (
-          <div className="text-center mb-4">
-            <div className="text-3xl font-bold mb-1">{timer.formattedTime}</div>
-            <Badge variant={activePomodoro.status === 'PAUSED' ? 'secondary' : 'default'}>
-              {activePomodoro.status === 'PAUSED' ? 'Pausado' : 'Focando'}
-            </Badge>
-          </div>
-        ) : (
-          <div className="flex justify-center mb-4">
-            <MagicalFlowerGrowth
-              progress={timer.progress * 100}
-              isActive={timer.isActive}
-              priority={getTaskPriority()}
-              size="md"
-              isLegendary={isLegendaryFlower()}
-            />
-          </div>
-        )}
+        <div className="text-center mb-4">
+          <div className="text-3xl font-bold mb-1">{timer.formattedTime}</div>
+          <Badge variant={activePomodoro.status === 'PAUSED' ? 'secondary' : 'default'}>
+            {activePomodoro.status === 'PAUSED' ? 'Pausado' : 'Focando'}
+          </Badge>
+        </div>
 
         {activePomodoro.task && (
           <div className="mb-4 p-3 bg-muted rounded-lg">

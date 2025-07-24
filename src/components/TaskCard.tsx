@@ -2,11 +2,10 @@ import { forwardRef, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Play, Pause, MoreHorizontal, Calendar, Flag, Edit2, Trash2 } from 'lucide-react';
+import { Clock, MoreHorizontal, Calendar, Edit2, Trash2, Target, CheckCircle, Circle } from 'lucide-react';
 import { Task } from '@/types/board';
-import { cn, formatRelativeTime, getPriorityColor } from '@/lib/utils';
+import { cn, formatRelativeTime } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { 
@@ -15,10 +14,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { useActivePomodoro, useStartPomodoro, useDeleteTask } from '@/hooks';
-import { TaskFlowerIndicator } from './TaskFlowerIndicator';
-import { CompleteTaskButton } from './CompleteTaskButton';
-import { TaskWithFlowerState } from '../types/taskFlower';
+import { useActivePomodoro, useDeleteTask, useTaskCompletion } from '@/hooks';
 
 interface TaskCardProps {
   task: Task;
@@ -33,8 +29,8 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
     const [isHovered, setIsHovered] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { data: activePomodoro } = useActivePomodoro();
-    const { mutate: startPomodoro } = useStartPomodoro();
     const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
+    const { completeTaskManually } = useTaskCompletion();
     
     const {
       attributes,
@@ -53,25 +49,16 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
     const isTaskActive = activePomodoro?.taskId === task.id;
     const completedPomodoros = task.pomodoros.filter(p => p.status === 'COMPLETED').length;
     const pomodoroProgress = task.pomodoroGoal > 0 ? (completedPomodoros / task.pomodoroGoal) * 100 : 0;
+    const isCompleted = task.completed || false;
 
-    // Converter task para TaskWithFlowerState
-    const taskWithFlowerState: TaskWithFlowerState = {
-      id: task.id,
-      title: task.title,
-      completed: task.completed || false,
-      completedPomodoros,
-      pomodoroGoal: task.pomodoroGoal || 0,
-      hasFlowers: task.hasFlowers, // Assumindo que essa propriedade será adicionada ao tipo Task
-      priority: task.priority
-    };
-
-    const handleStartPomodoro = () => {
-      if (!activePomodoro) {
-        startPomodoro({
-          taskId: task.id,
-          duration: 25,
-          breakTime: 5,
-        });
+    const handleCompleteTask = async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!isCompleted) {
+        try {
+          await completeTaskManually(task.id);
+        } catch (error) {
+          console.error('Erro ao completar tarefa:', error);
+        }
       }
     };
 
@@ -88,14 +75,24 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
       setIsMenuOpen(false);
     };
 
-    const getPriorityBadge = () => {
-      const variants = {
-        HIGH: 'bg-red-500/10 text-red-500 border-red-500/20',
-        MEDIUM: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
-        LOW: 'bg-green-500/10 text-green-500 border-green-500/20',
+    const handleCardClick = (e: React.MouseEvent) => {
+      // Evitar abrir o modal se clicar em botões ou dropdowns
+      if (
+        e.target instanceof HTMLElement && 
+        (e.target.closest('button') || e.target.closest('[role="menuitem"]'))
+      ) {
+        return;
+      }
+      onEdit?.(task);
+    };
+
+    const getPriorityBorderColor = () => {
+      const colors = {
+        HIGH: 'border-l-red-500',
+        MEDIUM: 'border-l-orange-500',
+        LOW: 'border-l-green-500',
       };
-      
-      return variants[task.priority];
+      return colors[task.priority];
     };
 
     return (
@@ -113,97 +110,124 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
           className={cn(
-            "relative group cursor-pointer transition-all duration-200",
+            "relative group transition-all duration-200",
             isSortableDragging && "opacity-50 rotate-2 scale-105"
           )}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <Card className={cn(
-            "p-3 md:p-4 border-l-4 hover:shadow-lg transition-all duration-200 touch-target",
-            isTaskActive && "ring-2 ring-primary/50 bg-primary/5",
-            taskWithFlowerState.completed && "opacity-60 bg-muted/30",
-            task.priority === 'HIGH' && "border-l-red-500",
-            task.priority === 'MEDIUM' && "border-l-orange-500",
-            task.priority === 'LOW' && "border-l-green-500",
-            isDragging && "shadow-xl"
-          )}>
-            <div className="flex items-start justify-between gap-2 md:gap-3">
+          <Card 
+            className={cn(
+              "p-4 border-l-4 hover:shadow-lg transition-all duration-200 cursor-pointer",
+              "bg-background hover:bg-muted/20",
+              isTaskActive && "ring-2 ring-primary/50 bg-primary/5",
+              isCompleted && "opacity-70 bg-muted/40",
+              getPriorityBorderColor(),
+              isDragging && "shadow-xl"
+            )}
+            onClick={handleCardClick}
+          >
+            <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className={cn(
-                    "font-medium text-sm line-clamp-2 flex-1 transition-all duration-300",
-                    taskWithFlowerState.completed && "line-through text-muted-foreground"
-                  )}>
-                    {task.title}
-                  </h3>
-                  <TaskFlowerIndicator task={taskWithFlowerState} hideText className="text-xs" />
-                  <Badge variant="outline" className={cn(getPriorityBadge(), "text-xs")}>
-                    <Flag className="w-3 h-3 mr-1" />
-                    {task.priority.toLowerCase()}
-                  </Badge>
+                {/* Header com título e status */}
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className={cn(
+                      "font-semibold text-base leading-tight mb-1",
+                      "text-foreground/90 hover:text-foreground transition-colors",
+                      isCompleted && "line-through text-muted-foreground"
+                    )}>
+                      {task.title}
+                    </h3>
+                  </div>
+                  
+                  
                 </div>
                 
+                {/* Descrição */}
                 {task.description && (
-                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2 md:mb-3">
+                  <p className="text-sm text-muted-foreground/80 leading-relaxed line-clamp-2 mb-3">
                     {task.description}
                   </p>
                 )}
 
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 md:mb-3">
+                {/* Metadados */}
+                <div className="space-y-2 mb-3">
                   {task.startAt && (
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="w-4 h-4" />
                       <span>{formatRelativeTime(task.startAt)}</span>
                     </div>
                   )}
                 </div>
 
+                {/* Progresso de Pomodoros */}
                 {task.pomodoroGoal > 0 && (
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        Pomodoros: {completedPomodoros}/{task.pomodoroGoal}
-                      </span>
-                      <span className="text-muted-foreground">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Target className="w-4 h-4" />
+                        <span className="font-medium">
+                          {completedPomodoros}/{task.pomodoroGoal} Pomodoros
+                        </span>
+                      </div>
+                      <span className="text-sm font-semibold text-foreground">
                         {Math.round(pomodoroProgress)}%
                       </span>
                     </div>
-                    <Progress value={pomodoroProgress} className="h-1" />
+                    <Progress 
+                      value={pomodoroProgress} 
+                      className="h-2 bg-muted/50" 
+                    />
                   </div>
                 )}
               </div>
 
+              {/* Botões de ação */}
               <AnimatePresence>
                 {(isHovered || isTaskActive || isMenuOpen) && (
                   <motion.div
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 10 }}
-                    className="flex items-center gap-1"
+                    className="flex items-center gap-1 flex-shrink-0"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <CompleteTaskButton task={taskWithFlowerState} iconOnly />
-                    
+                    {/* Botão de Pomodoro ativo */}
                     {isTaskActive && (
                       <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
+                        animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
-                        className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary"
+                        className="flex items-center gap-1 px-2 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20"
                       >
                         <Clock className="w-3 h-3" />
-                        <span className="text-xs font-medium">Ativo</span>
+                        <span className="text-xs font-semibold">Ativo</span>
                       </motion.div>
                     )}
                     
+                    {/* Botão de concluir tarefa */}
+                    {!isCompleted && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleCompleteTask}
+                        className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-950/30 dark:hover:text-green-400"
+                        title="Concluir tarefa"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                      </Button>
+                    )}
+                    
+                    {/* Menu de opções */}
                     <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                       <DropdownMenuTrigger asChild>
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-6 w-6 p-0 touch-target"
+                          className="h-8 w-8 p-0 hover:bg-muted/50"
                           disabled={isDeleting}
                         >
-                          <MoreHorizontal className="w-3 h-3" />
+                          <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">

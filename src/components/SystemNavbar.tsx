@@ -9,7 +9,6 @@ import {
   LogOut, 
   Settings,
   Menu,
-  Flower2,
   Sparkles,
   BarChart3
 } from 'lucide-react';
@@ -49,7 +48,6 @@ export default function SystemNavbar() {
       path: '/dashboard',
       active: location.pathname === '/dashboard'
     },
-
     {
       label: 'Pomodoro',
       icon: Timer,
@@ -57,16 +55,16 @@ export default function SystemNavbar() {
       active: location.pathname === '/pomodoro'
     },
     {
+      label: 'Stats',
+      icon: BarChart3,
+      path: '/stats',
+      active: location.pathname === '/stats'
+    },
+    {
       label: 'Boards',
       icon: Trello,
       path: '/boards',
       active: location.pathname === '/boards'
-    },
-    {
-      label: 'Jardim',
-      icon: Flower2,
-      path: '/garden',
-      active: location.pathname === '/garden'
     },
     {
       label: 'Lumi',
