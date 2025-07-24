@@ -14,7 +14,6 @@ import PomodoroPage from "./pages/PomodoroPage";
 import BoardsPage from "./pages/BoardsPage";
 import Board from "./pages/Board";
 import Profile from "./pages/Profile";
-import GardenPage from "./pages/GardenPage";
 import LumiPage from "./pages/Lumi";
 import TokenDebug from "./pages/TokenDebug";
 import NotFound from "./pages/NotFound";
@@ -40,7 +39,6 @@ const App = () => (
               <Route path="/pomodoro" element={<PomodoroPage />} />
               <Route path="/boards" element={<BoardsPage />} />
               <Route path="/board/:boardId" element={<Board />} />
-              <Route path="/garden" element={<GardenPage />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
 
@@ -48,7 +46,7 @@ const App = () => (
             <Route path="/lumi" element={<LumiPage />} />
             <Route path="/token-debug" element={<TokenDebug />} />
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Catch-all para 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
