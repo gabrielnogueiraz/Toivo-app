@@ -55,10 +55,10 @@ const Navbar = () => {
       <a href="/#preview" className="text-sm lg:text-base text-slate-300 hover:text-white transition-colors duration-200">
         Preview
       </a>
-      {/* <a href="/#precos" className="text-sm lg:text-base text-slate-300 hover:text-white transition-colors duration-200">
+      <a href="/#precos" className="text-sm lg:text-base text-slate-300 hover:text-white transition-colors duration-200">
         Preços
-      </a> */}
-      {/* <Link to="/login">
+      </a>
+      <Link to="/login">
         <Button
           variant="outline"
           size="sm"
@@ -67,7 +67,7 @@ const Navbar = () => {
           <span className="relative z-10">Entrar</span>
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </Button>
-      </Link> */}
+      </Link>
     </div>
   );
 
@@ -116,7 +116,7 @@ const Navbar = () => {
       >
         Preços
       </a>
-      {/* <Link to="/login" className="block">
+      <Link to="/login" className="block">
         <Button
           variant="outline"
           size="sm"
@@ -126,7 +126,7 @@ const Navbar = () => {
           <span className="relative z-10">Entrar</span>
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </Button>
-      </Link> */}
+      </Link>
     </div>
   );
 
