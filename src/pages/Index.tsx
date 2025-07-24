@@ -3,7 +3,6 @@ import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import TeaserSection from '@/components/TeaserSection';
 import LumiSection from '@/components/LumiSection';
-import GardenSection from '@/components/GardenSection';
 import FeaturesSection from '@/components/FeaturesSection';
 import PricingSection from '@/components/PricingSection';
 import CTASection from '@/components/CTASection';
@@ -208,7 +207,7 @@ const Index = () => {
         </AnimatedSection>
 
         <AnimatedSection delay={0.3} direction="scale">
-          <GardenSection />
+          <FeaturesSection />
         </AnimatedSection>
 
         <StaggeredReveal delay={0.4}>

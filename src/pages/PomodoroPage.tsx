@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Timer, 
-  Target, 
-  Coffee, 
-  Star, 
   Play, 
   Pause, 
+  Square, 
+  Timer, 
+  Users,
   RotateCcw, 
   Settings,
   CheckCircle2,
-  Clock,
-  Flower2
+  Clock
 } from 'lucide-react';
 import { TaskSelector } from '@/components/TaskSelector';
-import { MagicalFlowerGrowth } from '@/components/MagicalFlowerGrowth';
 import { PomodoroSettingsModal } from '@/components/PomodoroSettingsModal';
 import { useActivePomodoro, useStartPomodoro, usePausePomodoro, useFinishPomodoro } from '@/hooks';
 import { useEffectivePomodoroSettings } from '@/hooks/useEffectivePomodoroSettings';
@@ -38,7 +35,6 @@ export default function PomodoroPage() {
   const [sessionCount, setSessionCount] = useState(1);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showTaskSelector, setShowTaskSelector] = useState(false);
-  const [viewMode, setViewMode] = useState<'timer' | 'flower'>('timer');
 
   // Atualizar tempos baseado nas configurações do usuário
   useEffect(() => {
@@ -150,18 +146,18 @@ export default function PomodoroPage() {
 
   const getModeConfig = () => {
     switch (mode) {
-              case 'work':
-          return {
-            label: 'Foco',
-            icon: Target,
-            color: 'text-primary',
-            bgColor: 'bg-primary/10 dark:bg-primary/5',
-            borderColor: 'border-primary/20 dark:border-primary/10'
-          };
+      case 'work':
+        return {
+          label: 'Foco',
+          icon: Timer,
+          color: 'text-primary',
+          bgColor: 'bg-primary/10 dark:bg-primary/5',
+          borderColor: 'border-primary/20 dark:border-primary/10'
+        };
       case 'shortBreak':
         return {
           label: 'Pausa Curta',
-          icon: Coffee,
+          icon: Users,
           color: 'text-emerald-500',
           bgColor: 'bg-emerald-50 dark:bg-emerald-950/20',
           borderColor: 'border-emerald-200 dark:border-emerald-800'
@@ -169,19 +165,19 @@ export default function PomodoroPage() {
       case 'longBreak':
         return {
           label: 'Descanso Longo',
-          icon: Star,
+          icon: Square,
           color: 'text-purple-500',
           bgColor: 'bg-purple-50 dark:bg-purple-950/20',
           borderColor: 'border-purple-200 dark:border-purple-800'
         };
-              default:
-          return {
-            label: 'Foco',
-            icon: Target,
-            color: 'text-primary',
-            bgColor: 'bg-primary/10 dark:bg-primary/5',
-            borderColor: 'border-primary/20 dark:border-primary/10'
-          };
+      default:
+        return {
+          label: 'Foco',
+          icon: Timer,
+          color: 'text-primary',
+          bgColor: 'bg-primary/10 dark:bg-primary/5',
+          borderColor: 'border-primary/20 dark:border-primary/10'
+        };
     }
   };
 
@@ -251,178 +247,67 @@ export default function PomodoroPage() {
                   </div>
                 </motion.div>
 
-                                 {/* Active Task Display */}
-                 <AnimatePresence>
-                   {activePomodoro?.task && (
-                     <motion.div
-                       initial={{ opacity: 0, scale: 0.95 }}
-                       animate={{ opacity: 1, scale: 1 }}
-                       exit={{ opacity: 0, scale: 0.95 }}
-                       className="text-center mb-8"
-                     >
-                       <div className="inline-flex items-center gap-3 px-6 py-3 bg-background rounded-full border">
-                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                         <span className="text-sm text-muted-foreground">Trabalhando em:</span>
-                         <span className="font-medium">{activePomodoro.task.title}</span>
-                       </div>
-                     </motion.div>
-                   )}
-                 </AnimatePresence>
+                {/* Active Task Display */}
+                <AnimatePresence>
+                  {activePomodoro?.task && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="text-center mb-8"
+                    >
+                      <div className="inline-flex items-center gap-3 px-6 py-3 bg-background rounded-full border">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        <span className="text-sm text-muted-foreground">Trabalhando em:</span>
+                        <span className="font-medium">{activePomodoro.task.title}</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                 {/* View Toggle */}
-                 <div className="flex justify-center mb-8">
-                  <motion.div 
-                    className="inline-flex items-center bg-muted/30 backdrop-blur-sm p-1.5 rounded-2xl border border-border/50 shadow-lg"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
+                {/* Timer Display */}
+                <div className="text-center mb-8">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                    className="relative"
                   >
-                    {[
-                      { mode: 'timer', icon: Timer, label: 'Timer' },
-                      { mode: 'flower', icon: Flower2, label: 'Flor Mágica' }
-                    ].map(({ mode: toggleMode, icon: Icon, label }) => (
-                      <motion.div
-                        key={toggleMode}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <Button
-                          variant={viewMode === toggleMode ? 'default' : 'ghost'}
-                          size="sm"
-                          onClick={() => setViewMode(toggleMode as any)}
-                          className={cn(
-                            "rounded-xl gap-2 transition-all duration-300 relative",
-                            viewMode === toggleMode && "shadow-md"
-                          )}
-                        >
-                          <Icon className="w-4 h-4" />
-                          {label}
-                          {viewMode === toggleMode && (
-                            <motion.div
-                              layoutId="activeTab"
-                              className="absolute inset-0 bg-primary/10 rounded-xl -z-10"
-                              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            />
-                          )}
-                        </Button>
-                      </motion.div>
-                    ))}
+                    <div className="text-6xl md:text-8xl font-mono font-bold tracking-tight">
+                      {formatTime(timeLeft)}
+                    </div>
+                    
+                    {/* Progress Ring */}
+                    <div className="absolute inset-0 flex items-center justify-center -z-10">
+                      <svg className="w-full h-full max-w-[200px] md:max-w-[300px] -rotate-90" viewBox="0 0 100 100">
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          fill="none"
+                          className="text-muted-foreground/20"
+                        />
+                        <motion.circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          fill="none"
+                          className={modeConfig.color}
+                          strokeLinecap="round"
+                          initial={{ strokeDasharray: "0 283" }}
+                          animate={{ strokeDasharray: `${progress * 2.83} 283` }}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                        />
+                      </svg>
+                    </div>
+                    
+                    <Progress value={progress} className="mt-4 h-2" />
                   </motion.div>
                 </div>
-
-                                 {/* Timer or Flower Display */}
-                 <div className="text-center mb-8">
-                   <AnimatePresence mode="wait">
-                     {viewMode === 'timer' ? (
-                       <motion.div
-                         key="timer"
-                         initial={{ opacity: 0, scale: 0.8 }}
-                         animate={{ opacity: 1, scale: 1 }}
-                         exit={{ opacity: 0, scale: 0.8 }}
-                         transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                         className="relative"
-                       >
-                         <div className="text-6xl md:text-8xl font-mono font-bold tracking-tight">
-                           {formatTime(timeLeft)}
-                         </div>
-                         
-                         {/* Progress Ring */}
-                         <div className="absolute inset-0 flex items-center justify-center -z-10">
-                           <svg className="w-full h-full max-w-[200px] md:max-w-[300px] -rotate-90" viewBox="0 0 100 100">
-                             <circle
-                               cx="50"
-                               cy="50"
-                               r="45"
-                               stroke="currentColor"
-                               strokeWidth="2"
-                               fill="none"
-                               className="text-muted-foreground/20"
-                             />
-                             <motion.circle
-                               cx="50"
-                               cy="50"
-                               r="45"
-                               stroke="currentColor"
-                               strokeWidth="2"
-                               fill="none"
-                               className={modeConfig.color}
-                               strokeLinecap="round"
-                               initial={{ strokeDasharray: "0 283" }}
-                               animate={{ strokeDasharray: `${progress * 2.83} 283` }}
-                               transition={{ duration: 0.5, ease: "easeInOut" }}
-                             />
-                           </svg>
-                         </div>
-                         
-                         <Progress value={progress} className="mt-4 h-2" />
-                       </motion.div>
-                     ) : (
-                       <motion.div
-                         key="flower"
-                         initial={{ opacity: 0, scale: 0.8 }}
-                         animate={{ opacity: 1, scale: 1 }}
-                         exit={{ opacity: 0, scale: 0.8 }}
-                         transition={{ duration: 0.5 }}
-                         className="w-full max-w-md mx-auto relative"
-                       >
-                         <MagicalFlowerGrowth
-                           progress={progress}
-                           isActive={isRunning}
-                           priority={activePomodoro?.task?.priority || 'MEDIUM'}
-                           size="lg"
-                           isLegendary={activePomodoro?.task?.priority === 'HIGH' && Math.random() < 0.1}
-                         />
-                         
-                         {/* Elegant task selection overlay */}
-                         <AnimatePresence>
-                           {!activePomodoro && mode === 'work' && (
-                             <motion.div
-                               initial={{ opacity: 0, y: 20 }}
-                               animate={{ opacity: 1, y: 0 }}
-                               exit={{ opacity: 0, y: -20 }}
-                               transition={{ duration: 0.6, ease: "easeOut" }}
-                               className="absolute inset-0 flex items-center justify-center"
-                             >
-                               <motion.div
-                                 animate={{ 
-                                   scale: [1, 1.02, 1],
-                                   opacity: [0.9, 1, 0.9]
-                                 }}
-                                 transition={{ 
-                                   duration: 3, 
-                                   repeat: Infinity, 
-                                   ease: "easeInOut" 
-                                 }}
-                                 className="bg-white/95 backdrop-blur-lg border border-white/30 rounded-2xl px-6 py-4 shadow-2xl"
-                               >
-                                 <div className="flex items-center gap-3">
-                                   <motion.div
-                                     animate={{ rotate: [0, 10, -10, 0] }}
-                                     transition={{ 
-                                       duration: 2, 
-                                       repeat: Infinity, 
-                                       ease: "easeInOut" 
-                                     }}
-                                   >
-                                     <Flower2 className="w-5 h-5 text-primary" />
-                                   </motion.div>
-                                   <div className="text-center">
-                                     <p className="text-sm font-medium text-gray-800 mb-1">
-                                       Pronto para crescer
-                                     </p>
-                                     <p className="text-xs text-gray-600">
-                                       Selecione uma tarefa abaixo ↓
-                                     </p>
-                                   </div>
-                                 </div>
-                               </motion.div>
-                             </motion.div>
-                           )}
-                         </AnimatePresence>
-                       </motion.div>
-                     )}
-                   </AnimatePresence>
-                 </div>
 
                 {/* Controls */}
                 <div className="flex items-center justify-center gap-4">
@@ -482,9 +367,9 @@ export default function PomodoroPage() {
             <div className="flex justify-center">
               <div className="inline-flex items-center bg-muted/50 backdrop-blur-sm p-1 rounded-2xl border border-border/50 shadow-lg">
                 {[
-                  { mode: 'work', icon: Target, label: 'Foco' },
-                  { mode: 'shortBreak', icon: Coffee, label: 'Pausa' },
-                  { mode: 'longBreak', icon: Star, label: 'Descanso' }
+                  { mode: 'work', icon: Timer, label: 'Foco' },
+                  { mode: 'shortBreak', icon: Users, label: 'Pausa' },
+                  { mode: 'longBreak', icon: Square, label: 'Descanso' }
                 ].map(({ mode: buttonMode, icon: Icon, label }) => (
                   <motion.div
                     key={buttonMode}
