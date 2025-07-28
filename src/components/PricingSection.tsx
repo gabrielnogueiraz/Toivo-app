@@ -1,10 +1,19 @@
 import { Check, Sparkles, Crown, Star, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
+import { useSubscriptionData, useCreateCheckout } from '@/hooks/useSubscription';
+import { Plan, PLAN_CONFIG } from '@/types/subscription';
+import { PlanBadge } from '@/components/subscription';
 
 const PricingSection = () => {
+  const { isAuthenticated } = useAuth();
+  const { planInfo } = useSubscriptionData();
+  const createCheckout = useCreateCheckout();
+
   const plans = [
     {
-      name: "Freemium",
+      planKey: Plan.FREE,
+      name: "Gratuito",
       price: "Grátis",
       period: "para sempre",
       title: "Comece de graça e experimente o básico",
@@ -20,15 +29,17 @@ const PricingSection = () => {
         "Suporte por email"
       ],
       popular: false,
-      delay: "0s"
+      delay: "0s",
+      priceId: null
     },
     {
-      name: "Básico",
+      planKey: Plan.FOCUS,
+      name: "Focus",
       price: "R$ 12,90",
       period: "/mês",
       title: "Mais mensagens, mais quadros, mais controle",
-      description: "Quer ir além? Com o plano Básico, tenha até 40 mensagens diárias com a Lumi, organize até 7 quadros Kanban e mantenha o Pomodoro sem limites. O equilíbrio perfeito entre custo e benefício para quem quer produtividade real.",
-      cta: "Experimente o Básico e aumente seu potencial",
+      description: "Quer ir além? Com o plano Focus, tenha até 40 mensagens diárias com a Lumi, organize até 7 quadros Kanban e mantenha o Pomodoro sem limites. O equilíbrio perfeito entre custo e benefício para quem quer produtividade real.",
+      cta: "Assinar Focus",
       icon: Sparkles,
       gradient: "from-purple-500 to-violet-600",
       features: [
@@ -40,15 +51,17 @@ const PricingSection = () => {
         "Suporte prioritário"
       ],
       popular: true,
-      delay: "0.1s"
+      delay: "0.1s",
+      priceId: PLAN_CONFIG[Plan.FOCUS].priceId
     },
     {
+      planKey: Plan.PRO,
       name: "Pro",
       price: "R$ 19,90",
       period: "/mês",
       title: "Produtividade sem limites — para quem quer dominar o dia",
       description: "Liberte-se das restrições: mensagens ilimitadas com a Lumi, quadros Kanban ilimitados e Pomodoro livre para focar de verdade. O plano ideal para quem leva a produtividade a sério e quer resultados reais todos os dias.",
-      cta: "Seja Pro e transforme sua rotina",
+      cta: "Assinar Pro",
       icon: Crown,
       gradient: "from-pink-500 to-rose-600",
       features: [
@@ -61,9 +74,48 @@ const PricingSection = () => {
         "Backup automático em nuvem"
       ],
       popular: false,
-      delay: "0.2s"
+      delay: "0.2s",
+      priceId: PLAN_CONFIG[Plan.PRO].priceId
     }
   ];
+
+  const handlePlanSelect = (plan: typeof plans[0]) => {
+    if (!isAuthenticated) {
+      // Redirecionar para login se não estiver autenticado
+      window.location.href = '/login';
+      return;
+    }
+
+    if (plan.planKey === Plan.FREE) {
+      // Plano gratuito - redirecionar para dashboard
+      window.location.href = '/dashboard';
+      return;
+    }
+
+    if (plan.priceId) {
+      createCheckout.mutate(plan.priceId);
+    }
+  };
+
+  const isCurrentPlan = (planKey: Plan) => {
+    return planInfo?.plan === planKey;
+  };
+
+  const getButtonText = (plan: typeof plans[0]) => {
+    if (!isAuthenticated) {
+      return plan.planKey === Plan.FREE ? 'Começar grátis' : `Assinar ${plan.name}`;
+    }
+
+    if (isCurrentPlan(plan.planKey)) {
+      return 'Plano atual';
+    }
+
+    if (plan.planKey === Plan.FREE) {
+      return 'Plano gratuito';
+    }
+
+    return `Assinar ${plan.name}`;
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -133,6 +185,18 @@ const PricingSection = () => {
                   </div>
                 )}
 
+                {/* Current Plan Badge */}
+                {isAuthenticated && isCurrentPlan(plan.planKey) && (
+                  <div className="absolute -top-3 right-4">
+                    <PlanBadge 
+                      plan={plan.planKey}
+                      isTrialActive={planInfo?.isTrialActive}
+                      trialDaysRemaining={planInfo?.trialDaysRemaining}
+                      size="sm"
+                    />
+                  </div>
+                )}
+
                 {/* Icon */}
                 <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-r ${plan.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                   <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
@@ -178,9 +242,30 @@ const PricingSection = () => {
                 </ul>
 
                 {/* CTA Button */}
-                <button className={`w-full bg-gradient-to-r ${plan.gradient} text-white font-semibold py-3 sm:py-4 px-6 rounded-xl sm:rounded-2xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 group-hover:scale-105 flex items-center justify-center gap-2 text-sm sm:text-base`}>
-                  <span>{plan.cta}</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                <button 
+                  onClick={() => handlePlanSelect(plan)}
+                  disabled={createCheckout.isPending || (isAuthenticated && isCurrentPlan(plan.planKey))}
+                  className={`w-full font-semibold py-3 sm:py-4 px-6 rounded-xl sm:rounded-2xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 group-hover:scale-105 flex items-center justify-center gap-2 text-sm sm:text-base ${
+                    isAuthenticated && isCurrentPlan(plan.planKey)
+                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-500 cursor-not-allowed'
+                      : `bg-gradient-to-r ${plan.gradient} text-white`
+                  }`}
+                >
+                  {createCheckout.isPending ? (
+                    <>
+                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      <span>Processando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{getButtonText(plan)}</span>
+                      {!isAuthenticated || !isCurrentPlan(plan.planKey) ? (
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      ) : (
+                        <Check className="w-4 h-4" />
+                      )}
+                    </>
+                  )}
                 </button>
               </motion.div>
             );
