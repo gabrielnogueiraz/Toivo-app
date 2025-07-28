@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, User, Mail, Palette, Save, X, Upload, Check } from 'lucide-react';
+import { Camera, User, Mail, Palette, Save, X, Upload, Check, Crown, CreditCard, Coins } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,6 +9,9 @@ import {
   useUpdateProfile,
   useUpdateAvatar,
   useUpdateTheme,
+  useSubscriptionData,
+  useCreateCheckout,
+  useBuyCreditPack
 } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +22,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToStorage, validateImageFile } from '@/utils/imageUpload';
+import { PlanBadge, UsageCounter, UpgradeModal, TrialCountdown } from '@/components/subscription';
+import { Plan, PLAN_CONFIG, CREDIT_PACKS } from '@/types/subscription';
 
 const profileSchema = z.object({
   name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
@@ -54,6 +59,7 @@ const themes = [
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -61,6 +67,11 @@ export default function ProfilePage() {
   const { mutate: updateProfile, isPending: isUpdatingProfile } = useUpdateProfile();
   const { mutate: updateAvatar, isPending: isUpdatingAvatar } = useUpdateAvatar();
   const { mutate: updateTheme, isPending: isUpdatingTheme } = useUpdateTheme();
+  
+  // Subscription hooks
+  const { planInfo, isLoading: isLoadingSubscription } = useSubscriptionData();
+  const createCheckout = useCreateCheckout();
+  const buyCreditPack = useBuyCreditPack();
 
   const {
     register,
@@ -172,6 +183,19 @@ export default function ProfilePage() {
     setIsEditing(false);
   };
 
+  const handleUpgrade = () => {
+    setShowUpgradeModal(true);
+  };
+
+  const handlePlanUpgrade = (priceId: string) => {
+    createCheckout.mutate(priceId);
+    setShowUpgradeModal(false);
+  };
+
+  const handleCreditPurchase = (pack: keyof typeof CREDIT_PACKS) => {
+    buyCreditPack.mutate(pack);
+  };
+
   if (isLoading) {
     return (
       <div className="h-full p-4 md:p-6">
@@ -184,11 +208,20 @@ export default function ProfilePage() {
             <div className="space-y-6">
               <Skeleton className="h-60" />
             </div>
-          </div>
-        </div>
+                  </div>
       </div>
-    );
-  }
+
+      {/* Modal de upgrade */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        currentPlan={planInfo?.plan}
+        reason="upgrade_recommended"
+        onUpgrade={handlePlanUpgrade}
+      />
+    </div>
+  );
+}
 
   if (error || !user || !user.name || !user.email) {
     return (
@@ -220,12 +253,14 @@ export default function ProfilePage() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Coluna principal - Informações pessoais e Assinatura */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="lg:col-span-2"
+            className="lg:col-span-2 space-y-6"
           >
+            {/* Card de Informações Pessoais */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -345,8 +380,148 @@ export default function ProfilePage() {
                 </form>
               </CardContent>
             </Card>
+
+            {/* Card de Assinatura */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="w-5 h-5" />
+                  Assinatura
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isLoadingSubscription ? (
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-8 w-2/3" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                ) : planInfo ? (
+                  <>
+                    {/* Plano atual e trial */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Plano atual</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <PlanBadge 
+                            plan={planInfo.plan}
+                            isTrialActive={planInfo.isTrialActive}
+                            trialDaysRemaining={planInfo.trialDaysRemaining}
+                            size="md"
+                          />
+                          {planInfo.plan !== Plan.PRO && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleUpgrade}
+                              className="ml-2"
+                            >
+                              <Crown className="w-4 h-4 mr-1" />
+                              Upgrade
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Trial countdown se ativo */}
+                    {planInfo.isTrialActive && planInfo.trialEndsAt && planInfo.trialDaysRemaining !== null && (
+                      <TrialCountdown
+                        daysRemaining={planInfo.trialDaysRemaining}
+                        trialEndsAt={planInfo.trialEndsAt}
+                        onUpgrade={handleUpgrade}
+                        variant="banner"
+                        size="sm"
+                      />
+                    )}
+
+                    {/* Contador de uso */}
+                    <UsageCounter
+                      used={planInfo.messagesUsedToday}
+                      limit={planInfo.dailyLimit}
+                      extraCredits={planInfo.extraCredits}
+                      size="sm"
+                    />
+
+                    {/* Créditos extras se disponíveis */}
+                    {planInfo.extraCredits > 0 && (
+                      <div className="flex items-center justify-between p-3 bg-accent rounded-lg border border-border">
+                        <div className="flex items-center gap-2">
+                          <Coins className="w-4 h-4 text-accent-foreground" />
+                          <span className="text-sm font-medium text-accent-foreground">
+                            {planInfo.extraCredits} crédito{planInfo.extraCredits !== 1 ? 's' : ''} extra{planInfo.extraCredits !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Opções de upgrade ou compra de créditos */}
+                    {planInfo.plan === Plan.FREE && (
+                      <div className="space-y-3">
+                        <div className="text-center p-4 bg-primary/5 rounded-lg border border-primary/20">
+                          <h4 className="font-medium text-primary mb-2">
+                            Desbloquear mais recursos
+                          </h4>
+                          <div className="grid grid-cols-1 gap-2">
+                            <Button
+                              onClick={handleUpgrade}
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                            >
+                              <Crown className="w-4 h-4 mr-2" />
+                              Ver planos premium
+                            </Button>
+                            <div className="grid grid-cols-2 gap-2">
+                              {Object.entries(CREDIT_PACKS).map(([packKey, pack]) => (
+                                <Button
+                                  key={packKey}
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleCreditPurchase(packKey as keyof typeof CREDIT_PACKS)}
+                                  className="text-xs border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                                >
+                                  <Coins className="w-3 h-3 mr-1" />
+                                  {pack.name} - R$ {pack.price.toFixed(2)}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Informações do plano */}
+                    <div className="pt-2 border-t border-border">
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Plano</span>
+                          <span className="font-medium">{PLAN_CONFIG[planInfo.plan].name}</span>
+                        </div>
+                        {planInfo.plan !== Plan.FREE && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Valor mensal</span>
+                            <span className="font-medium">R$ {PLAN_CONFIG[planInfo.plan].price.toFixed(2)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Limite diário</span>
+                          <span className="font-medium">
+                            {planInfo.dailyLimit === Infinity ? 'Ilimitado' : `${planInfo.dailyLimit} mensagens`}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center p-4 text-muted-foreground">
+                    <Crown className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p>Informações de assinatura não disponíveis</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </motion.div>
 
+          {/* Coluna lateral - Tema e Estatísticas */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -418,6 +593,15 @@ export default function ProfilePage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Modal de upgrade */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        currentPlan={planInfo?.plan}
+        reason="upgrade_recommended"
+        onUpgrade={handlePlanUpgrade}
+      />
     </div>
   );
 }
