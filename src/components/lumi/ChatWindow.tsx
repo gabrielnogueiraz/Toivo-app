@@ -1,226 +1,217 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Bot, User, Loader2, AlertTriangle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { MessageBubble } from './MessageBubble';
-import { InputBar } from './InputBar';
-import { FloatingInput } from './FloatingInput';
-import { useLumi } from '@/hooks/useLumi';
-import { useLumiContext } from '@/contexts/LumiContext';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
+import { useLumiContext } from '@/contexts/LumiContext';
+import { useMessageLimitCheck, useRecordMessage } from '@/hooks/useSubscription';
+import { UpgradeModal } from '@/components/subscription';
+import { MessageBubble } from './MessageBubble';
+import { LumiMessage } from '@/types/lumi';
 import { cn } from '@/lib/utils';
-import { getTimeBasedGreeting } from '@/utils/lumiGreetings';
-import { 
-  RefreshCw, 
-  Trash2,
-  AlertCircle 
-} from 'lucide-react';
-import lumiLogo from '@/assets/LumiLogo.png';
 
-interface ChatWindowProps {
-  className?: string;
-}
-
-export const ChatWindow: React.FC<ChatWindowProps> = ({ className }) => {
-  const { isConnected } = useLumiContext();
-  const { user } = useAuth();
-  const {
-    messages,
-    isLoading,
-    error,
-    sendMessageStream,
-    clearMessages,
-    clearError,
-    retryLastMessage,
-  } = useLumi({
-    autoSaveMemories: true,
-    maxMessages: 100,
-  });
-
+const ChatWindow: React.FC = () => {
+  const [messages, setMessages] = useState<LumiMessage[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [greeting] = useState(() => getTimeBasedGreeting(user?.name || user?.email?.split('@')[0] || 'usuário'));
-  const [hasStartedConversation, setHasStartedConversation] = useState(false);
+  
+  const { user } = useAuth();
+  const { lumiService, isConnected } = useLumiContext();
+  const { canSendMessage, checkAndRecord, isChecking } = useMessageLimitCheck();
+  const recordMessage = useRecordMessage();
 
-  const hasMessages = messages.length > 0;
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  // Auto-scroll para a última mensagem
   useEffect(() => {
-    if (messagesEndRef.current && hasMessages) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, hasMessages]);
+    scrollToBottom();
+  }, [messages]);
 
-  const handleSendMessage = async (message: string) => {
-    if (!hasStartedConversation) {
-      setHasStartedConversation(true);
-    }
-    await sendMessageStream(message);
+  const addMessage = (content: string, isFromUser: boolean) => {
+    const newMessage: LumiMessage = {
+      id: Date.now().toString(),
+      content,
+      isFromUser,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, newMessage]);
   };
 
-  const handleClearMessages = () => {
-    clearMessages();
-    clearError();
-    setHasStartedConversation(false);
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || !lumiService || !isConnected) return;
+
+    // Verificar limite antes de enviar
+    const canSend = await checkAndRecord();
+    
+    if (!canSend) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    const userMessage = inputMessage.trim();
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      // Adicionar mensagem do usuário
+      addMessage(userMessage, true);
+
+      // Enviar para Lumi
+      const lumiResponse = await lumiService.sendMessage(userMessage);
+      
+      // Verificar se houve erro na resposta
+      if (lumiResponse.error) {
+        throw new Error(lumiResponse.error);
+      }
+      
+      // Adicionar resposta da Lumi
+      addMessage(lumiResponse.content, false);
+
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      
+      // Se for erro de limite, mostrar modal
+      if (error instanceof Error && error.message.includes('Limite de mensagens excedido')) {
+        setShowUpgradeModal(true);
+      } else {
+        addMessage('Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.', false);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const isDisabled = !canSendMessage || isLoading || isChecking || !isConnected;
 
   return (
-    <div className={cn(
-      'flex flex-col h-full bg-gradient-to-b from-background to-muted/20',
-      className
-    )}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-background/80 backdrop-blur-sm">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10">
-            <img src={lumiLogo} alt="Lumi" className="w-full h-full" />
-          </div>
-          <div>
-            <h1 className="text-base sm:text-lg font-semibold">Lumi</h1>
-            <p className="text-xs text-muted-foreground hidden sm:block">Sua assistente de produtividade</p>
-          </div>
-        </div>
+    <div className="flex flex-col h-full bg-background">
+      {/* Messages Container */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                 <AnimatePresence>
+           {messages.map((message) => (
+             <MessageBubble
+               key={message.id}
+               message={message}
+             />
+           ))}
+         </AnimatePresence>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          {error && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={retryLastMessage}
-              className="text-destructive hover:text-destructive/80 h-8 w-8 sm:h-9 sm:w-9"
-            >
-              <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </Button>
-          )}
-          
-          {hasMessages && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClearMessages}
-              className="text-muted-foreground hover:text-foreground h-8 w-8 sm:h-9 sm:w-9"
-            >
-              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </Button>
-          )}
-        </div>
+        {/* Loading indicator */}
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 text-muted-foreground"
+          >
+            <Bot className="w-5 h-5" />
+            <div className="flex items-center gap-1">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Lumi está pensando...</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Connection status */}
+        {!isConnected && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg"
+          >
+            <AlertTriangle className="w-5 h-5 text-orange-600" />
+            <span className="text-sm text-orange-700 dark:text-orange-300">
+              Conectando com Lumi...
+            </span>
+          </motion.div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Messages Area or Welcome Screen */}
-      <div className="flex-1 flex flex-col min-h-0 relative">
-        {!hasMessages ? (
-          /* Welcome Screen with Floating Input */
-          <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
-            {/* Avatar */}
-            <div className="w-16 sm:w-20 h-16 sm:h-20 mb-6 sm:mb-8">
-              <img src={lumiLogo} alt="Lumi" className="w-full h-full" />
+      {/* Input Area */}
+      <div className="border-t border-border bg-background p-4">
+        {/* Limit warning */}
+        {!canSendMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-3 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg"
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-600" />
+              <span className="text-sm text-red-700 dark:text-red-300">
+                Limite de mensagens diárias atingido
+              </span>
             </div>
-            
-            {/* Greeting */}
-            <div className="text-center max-w-xs sm:max-w-md mb-8 sm:mb-12">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 sm:mb-3">
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  {greeting.title.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '')}
-                </span>
-                <span className="ml-1">
-                  {greeting.title.match(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu)?.[0] || ''}
-                </span>
-              </h2>
-              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-                {greeting.description}
-              </p>
-            </div>
+            <Button 
+              size="sm" 
+              onClick={() => setShowUpgradeModal(true)}
+              className="mt-2 bg-red-600 hover:bg-red-700"
+            >
+              Ver opções de upgrade
+            </Button>
+          </motion.div>
+        )}
 
-            {/* Floating Input */}
-            <div className={cn(
-              'w-full max-w-xs sm:max-w-2xl transition-all duration-500 ease-in-out px-4 sm:px-0',
-              hasStartedConversation 
-                ? 'transform translate-y-8 opacity-0 pointer-events-none scale-95' 
-                : 'transform translate-y-0 opacity-100 scale-100'
-            )}>
-              <FloatingInput
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-                isConnected={isConnected}
-                placeholder="Pergunte alguma coisa"
-              />
-            </div>
+        <div className="flex gap-2">
+          <Textarea
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={
+              isDisabled 
+                ? !canSendMessage 
+                  ? "Limite de mensagens atingido"
+                  : !isConnected 
+                    ? "Conectando..."
+                    : "Digite sua mensagem..."
+                : "Digite sua mensagem..."
+            }
+            className="flex-1 min-h-[44px] max-h-32 resize-none"
+            disabled={isDisabled}
+          />
+          <Button
+            onClick={handleSendMessage}
+            disabled={isDisabled || !inputMessage.trim()}
+            size="sm"
+            className={cn(
+              "px-3 py-2 h-auto min-w-[44px]",
+              isDisabled && "cursor-not-allowed"
+            )}
+          >
+            {isLoading || isChecking ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+          </Button>
+        </div>
 
-            {/* Quick Actions */}
-            <div className={cn(
-              'mt-6 sm:mt-8 grid grid-cols-1 gap-2 sm:gap-3 max-w-xs sm:max-w-md w-full px-4 sm:px-0 transition-all duration-500 delay-75 ease-in-out',
-              hasStartedConversation 
-                ? 'transform translate-y-8 opacity-0 pointer-events-none scale-95' 
-                : 'transform translate-y-0 opacity-100 scale-100'
-            )}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSendMessage('Como posso ser mais produtivo hoje?')}
-                disabled={!isConnected || isLoading}
-                className="text-xs sm:text-sm h-9 sm:h-10"
-              >
-                Dicas de produtividade
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSendMessage('Qual é o meu progresso atual?')}
-                disabled={!isConnected || isLoading}
-                className="text-xs sm:text-sm h-9 sm:h-10"
-              >
-                Meu progresso
-              </Button>
-            </div>
+        {/* User info */}
+        {user && (
+          <div className="mt-2 text-xs text-muted-foreground">
+            Conversando como {user.name}
           </div>
-        ) : (
-          /* Chat Messages */
-          <>
-            <ScrollArea ref={scrollAreaRef} className="flex-1 p-4 sm:p-6">
-              <div className="space-y-0 max-w-4xl mx-auto">
-                {messages.map((message) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                  />
-                ))}
-                
-                {/* Error Message */}
-                {error && (
-                  <div className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                    <span className="flex-1 min-w-0">{error}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearError}
-                      className="ml-auto h-6 w-6 p-0 hover:bg-destructive/20 flex-shrink-0"
-                    >
-                      ×
-                    </Button>
-                  </div>
-                )}
-                
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
-
-            {/* Bottom Input Bar */}
-            <div className={cn(
-              'transition-all duration-500 ease-in-out border-t bg-background/80 backdrop-blur-sm',
-              hasStartedConversation 
-                ? 'transform translate-y-0 opacity-100' 
-                : 'transform translate-y-full opacity-0 pointer-events-none'
-            )}>
-              <InputBar
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-                isConnected={isConnected}
-                placeholder="Converse com a Lumi..."
-              />
-            </div>
-          </>
         )}
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        reason="limit_exceeded"
+      />
     </div>
   );
 };
